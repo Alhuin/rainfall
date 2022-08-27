@@ -1,4 +1,4 @@
-- `$ ls -la`
+- `ls -la`
   ```
   [...]
     -rwsr-x---+ 1 level1 users  747441 Mar  6  2016 level0
@@ -6,7 +6,7 @@
   ```
   - On a un binaire appartenant a level1 dans le home
  
-- `$ ./level0`
+- `./level0`
   ```
     Segmentation fault (core dumped)
   ```
@@ -16,8 +16,8 @@
     No !
   ```
 
-- `$ gdb level0`
-  - `$ disas main`
+- `gdb level0`
+  - `disas main`
     ```
       Dump of assembler code for function main:
     [...]
@@ -27,8 +27,13 @@
     ```
     - On a un call a atoi, puis un call a cmp avec le résultat et 0x1a7 (423)
 
-- `$ ./level0 423`
-  - `$ whoami`
+- `./level0 423`
+  - `whoami`
   ```
     level1
+  ```
+
+- `cat /home/user/level1/.pass`
+  ```
+    1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a
   ```
