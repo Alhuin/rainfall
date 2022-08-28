@@ -68,12 +68,12 @@
   - `gdb level1`
     - `layout reg`
     - `run < /tmp/exploit`
-    ```
-      Starting program: /home/user/level1/level1 < /tmp/exploit
+      ```
+        Starting program: /home/user/level1/level1 < /tmp/exploit
 
-      Program received signal SIGSEGV, Segmentation fault.
-      0x61616161 in ?? ()
-    ```
+        Program received signal SIGSEGV, Segmentation fault.
+        0x61616161 in ?? ()
+      ```
     - Nice, on SegFault comme attendu et l'eip est réécrit avec des a:
       ```
         eip            0x61616161       0x61616161
