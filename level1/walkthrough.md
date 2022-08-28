@@ -49,12 +49,12 @@
     [...]
     ```
     - La fonction run met la valeur située à 0x8048570 dans eax
-    - Call fwrite avec la valeur dans eax (donc la valeur à 0x8048570):
+    - Call fwrite() avec la valeur dans eax (donc la valeur à 0x8048570):
       - `x/s 0x8048570`
         ```
           0x8048570:	 "Good... Wait what?\n"
         ```
-    - Call systeme avec la valeur située à 0x8048584:
+    - Call system() avec la valeur située à 0x8048584:
       - `x/s 0x8048584`
         ```
           0x8048584:	 "/bin/sh"
