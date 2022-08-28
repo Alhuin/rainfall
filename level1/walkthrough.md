@@ -1,7 +1,7 @@
 - `ls -la`
   ```
   [...]
-    -rwsr-x---+ 1 level1 users  747441 Mar  6  2016 level0  
+    -rwsr-x---+ 1 level1 users  747441 Mar  6  2016 level0
   [...]
   ```
     - On a un binaire appartenant a level1 dans le home
@@ -11,7 +11,7 @@
     Segmentation fault (core dumped)
   ```
 
-- `./level0 test`
+- `$ ./level0 test`
   ```
     No !
   ```
@@ -25,7 +25,7 @@
         0x08048ed9 <+25>:	cmp    $0x1a7,%eax
       [...]
       ```
-        - On a un call a atoi, puis un call a cmp entre le résultat et 0x1a7 (423)
+        - On a un call a atoi, puis un call a cmp avec le résultat et 0x1a7 (423)
 
 - `./level0 423`
     - `whoami`
