@@ -107,7 +107,7 @@
       - Call execv() avec les parametres stockés la stack<br/><br/>
     - <+150>
       - Jump à <+192><br/><br/>
-    - <+152> ... <+187>    <- jump comditionnel depuis <+30>
+    - <+152> ... <+187>    (Ici on est au jump conditionnel de <+30>)
       - Stocke la valeur du registre data segment à l'adresse 0x80c5348 dans eax, puis dans edx
         - `x/s 0x80c5348`
           - `0x80ee170 <stderr>:	 "\240\347\016\b@\350\016\b\340\350\016\b"`
