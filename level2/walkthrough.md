@@ -123,10 +123,10 @@
 La fonction p() fait donc:
   - fflush(stdout) => clean stdout
   - gets(ebp - 76) => attend un input
-  - vérifie avec un filtre binaire et un cmp si l'eip ne commence pas par 0xb... (ne pointe pas sur la stack)
-    - si c'est pas le cas:
-      - printf("%p\b", eip) affiche la valeur du pointeur sur eip
-      - exit(1)
+  - vérifie avec un filtre binaire et un cmp si l'eip commence par 0xb...
+    - si c'est le cas:
+      - printf("%p\b", eip) => affiche la valeur du pointeur sur eip
+      - exit(1) => quitte la fonction
     - sinon:
       - puts(ebp - 76) => affiche le retour du gets
       - strdup(ebp - 76) => copie le retour du gets dans un malloc
