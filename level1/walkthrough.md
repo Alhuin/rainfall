@@ -96,7 +96,7 @@
 
 ## Exploit
 
-- L'objectif va être de forcer l'appel de la fonction run() par la fonction main() pour avoir notre shell.
+- L'objectif va être de forcer l'appel de la fonction run() par la fonction main() pour avoir notre shell en tant que level2.
 - On va tirer avantage de la [vulnérabilité de gets à un buffer overflow](https://faq.cprogramming.com/cgi-bin/smartfaq.cgi?answer=1049157810&id=1043284351) pour écrire l'adresse de run dans l'EIP, puisqu'il n'est pas protégé.
 - Comme vu plus haut, main alloue 80 octets dans la stack pour ses variables, on va commencer par là:
   - `python -c 'print "a" * 80' > /tmp/exploit`
