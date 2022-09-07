@@ -126,10 +126,10 @@ On comprend donc que la fonction main attend un argument, va exécuter atoi dess
 
 ## Exploit
 - `./level0 423`
-    - `whoami`
-    ```
-      level1
-    ```
+  - `whoami`
+  ```
+    level1
+  ```
 
 - `cat /home/user/level1/.pass`
   ```
