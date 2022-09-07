@@ -97,4 +97,25 @@
     - Stocke eax (l'adresse de l'eip) dans ebp - 12
     - Applique un filtre binaire (0xb0000000) à la valeur de eax
     - Compare la nouvelle valeur de eax avec 0xb0000000
-    - Jump à <p +83> si la comparaison n'est pas vraie
+    - Jump à <p +83> si la comparaison n'est pas vraie<br/><br/>
+  - <+51> ... <+66>
+    - Stocke la valeur à l'adresse 0x8048620 dans eax
+      - `x/s 0x8048620`
+        - `0x8048620:	 "(%p)\n"`
+    - Stocke la valeur à ebp - 12 (l'adresse de l'eip) dans edx
+    - Stocke la valeur de edx dans la stack (à esp + 4)
+    - Stocke la valeur de eax ("(%p)\n") dans la stack (à esp)
+    - Call printf() avec les arguments stocké dans la stack<br/><br/>
+  - <+71> ... <+78>
+    - Stocke 0x1 (1) dans la stack (à esp)
+    - Call exit() avec l'argument stocké dans la stack<br/><br/>
+  - <+83> ... <+89>
+    - Stocke l'adresse de ebp - 76 dans eax
+    - Stocke eax (ebp - 76) dans la stack (à esp)
+    - Call puts() avec l'argument stocké dans la stack<br/><br/>
+  - <+94> ... <+100>
+    - Stocke l'adresse de ebp - 76 dans eax
+    - Stocke eax (ebp - 76) dans la stack (à esp)
+    - Call strdup() avec l'argument stocké dans la stack<br/><br/>
+  - <+105> ... <+106>
+    - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
