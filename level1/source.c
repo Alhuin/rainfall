@@ -9,6 +9,6 @@ void run() {
 int main() {
     char str[76];
 
-    gets(&str);
+    gets(str);
     return 0;
 }
