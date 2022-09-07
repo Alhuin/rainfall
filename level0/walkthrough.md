@@ -122,7 +122,7 @@
     - <+192> ... <+198>
       - réinitialisation de la mémoire, fin d'exécution<br/><br/>
 
-On comprend donc que la fonction main attend un argument, va exécuter atoi dessus et lancer un shell si le retour d'atoi est égal à 423, sinon afficher "No !\n" sur la sortie d'erreur.
+On comprend donc que la fonction main attend un argument, va exécuter atoi dessus et lancer un shell si le retour d'atoi est égal à 423, sinon afficher "No !\n" sur la sortie d'erreur. Puisque le binaire à les droits SUID, le shell sera lancé en tant que level1.
 
 ## Exploit
 - `./level0 423`
