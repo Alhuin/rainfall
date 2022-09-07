@@ -89,11 +89,11 @@
     - Stocke la valeur de eax (stdout) dans la stack (à esp)
     - Call fflush() avec l'argument stocké dans la stack<br/><br/>
   - <+19> ... <+25>
-    - Stocke l'adresse de ebp - 12 dans eax
-    - Stocke la valeur de eax (l'adresse de ebp - 12) dans la stack (à esp)
+    - Fait pointer eax sur ebp - 76
+    - Stocke eax (l'adresse de ebp - 76) dans la stack (à esp)
     - Call gets() avec l'argument stocké dans la stack<br/><br/>
   - <+30> ... <+49>
-    - Stocke l'adresse de l'eip (ebp + 4) dans eax
+    - Stocke l'adresse ebp + 4 (l'eip) dans eax
     - Stocke eax (l'adresse de l'eip) dans ebp - 12
     - Applique un filtre binaire (0xb0000000) à la valeur de eax
     - Compare la nouvelle valeur de eax avec 0xb0000000
@@ -105,17 +105,28 @@
     - Stocke la valeur à ebp - 12 (l'adresse de l'eip) dans edx
     - Stocke la valeur de edx dans la stack (à esp + 4)
     - Stocke la valeur de eax ("(%p)\n") dans la stack (à esp)
-    - Call printf() avec les arguments stocké dans la stack<br/><br/>
+    - Call printf() avec les arguments stockés dans la stack<br/><br/>
   - <+71> ... <+78>
     - Stocke 0x1 (1) dans la stack (à esp)
     - Call exit() avec l'argument stocké dans la stack<br/><br/>
-  - <+83> ... <+89>
-    - Stocke l'adresse de ebp - 76 dans eax
+  - <+83> ... <+89> (Jump conditionnel depuis <+49>)
+    - Fait pointer eax sur ebp - 76 (le retour du gets)
     - Stocke eax (ebp - 76) dans la stack (à esp)
     - Call puts() avec l'argument stocké dans la stack<br/><br/>
   - <+94> ... <+100>
-    - Stocke l'adresse de ebp - 76 dans eax
+    - Fait pointer eax sur ebp - 76 (le retour du gets)
     - Stocke eax (ebp - 76) dans la stack (à esp)
     - Call strdup() avec l'argument stocké dans la stack<br/><br/>
   - <+105> ... <+106>
     - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
+
+La fonction p() fait donc:
+  - fflush(stdout) => clean stdout
+  - gets(ebp - 76) => attend un input
+  - vérifie avec un filtre binaire et un cmp si l'eip ne commence pas par 0xb... (ne pointe pas sur la stack)
+    - si ce n'est pas le cas:
+      - printf("%p\b", eip) affiche la valeur du pointeur sur eip
+      - exit(1)
+    - si c'est le cas:
+      - puts(ebp - 76) => affiche le retour du gets
+      - strdup(ebp - 76) => copie le retour du gets dans un malloc
