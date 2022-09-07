@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void p() {
+char *p() {
     char buffer[76]
     void *eip;
 
@@ -14,7 +14,7 @@ void p() {
         exit(1);
     }
     puts(buffer);
-    strdup(buffer);
+    return(strdup(buffer));
 }
 
 int main(int argc, char **argv) {
