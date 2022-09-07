@@ -101,7 +101,6 @@
 - Comme vu plus haut, main alloue 80 octets dans la stack pour ses variables, on va commencer par là:
   - `python -c 'print "a" * 80' > /tmp/exploit`
   - `gdb level1`
-    - `set disassembly-flavor intel`
     - `run < /tmp/exploit`
       ```
       Starting program: /home/user/level1/level1 < /tmp/exploit
