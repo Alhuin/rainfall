@@ -76,7 +76,7 @@
        0x08048f86 <+198>:	ret  
     ```
     - <+0> ... <+6>
-      - Initialisation de la mémoire<br/><br/>
+      - Initialisation de la mémoire (libère 32 octets pour la stack et aligne la mémoire)<br/><br/>
     - <+9> ... <+17>
       - Fait pointer eax sur argv[1] et stocke sa valeur dans esp<br/><br/>
     - <+20> ... <+30>
