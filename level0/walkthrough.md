@@ -24,7 +24,7 @@
   - `set disassembly-flavor intel`
   - `disas main`
     ```asm
-       Dump of assembler code for function main:
+    Dump of assembler code for function main:
        0x08048ec0 <+0>:	push   ebp
        0x08048ec1 <+1>:	mov    ebp,esp
        0x08048ec3 <+3>:	and    esp,0xfffffff0
@@ -73,7 +73,8 @@
        0x08048f7b <+187>:	call   0x804a230 <fwrite>
        0x08048f80 <+192>:	mov    eax,0x0
        0x08048f85 <+197>:	leave
-       0x08048f86 <+198>:	ret  
+       0x08048f86 <+198>:	ret
+    End of assembler dump.
     ```
     - <+0> ... <+6>
       - Initialisation de la mémoire (libère 32 octets pour la stack et aligne la mémoire)<br/><br/>
