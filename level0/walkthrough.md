@@ -107,7 +107,7 @@
       - Call execv() avec les parametres stockés la stack<br/><br/>
     - <+150>
       - Jump à <+192><br/><br/>
-    - <+152> ... <+187>    (Ici on est au jump conditionnel de <+30>)
+    - <+152> ... <+187>   (Jump conditionnel depuis <+30>)
       - Stocke la valeur du registre data segment à l'adresse 0x80c5348 dans eax, puis dans edx
         - `x/s 0x80c5348`
           - `0x80ee170 <stderr>:	 "\240\347\016\b@\350\016\b\340\350\016\b"`
@@ -119,7 +119,7 @@
       - Stocke 0x1 (1) dans la stack (esp + 4)
       - Stocke la valeur de eax ("No !\n") dans la stack (esp)
       - Call fwrite() avec les parametres stockés dans la stack<br/><br/>
-    - <+192> ... <+198>
+    - <+192> ... <+198>   (Jump inconditionnel depuis <+150>)
       - réinitialisation de la mémoire, fin d'exécution<br/><br/>
 
 On comprend donc que la fonction main attend un argument, va exécuter atoi dessus et lancer un shell si le retour d'atoi est égal à 423, sinon afficher "No !\n" sur la sortie d'erreur. Puisque le binaire à les droits SUID, le shell sera lancé en tant que level1.
