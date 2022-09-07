@@ -78,32 +78,32 @@
     - <+0> ... <+6>
       - Initialisation de la mémoire<br/><br/>
     - <+9> ... <+17>
-      - Fait pointer eax sur argv[1] et stocke sa valeur à l'adresse de esp<br/><br/>
+      - Fait pointer eax sur argv[1] et stocke sa valeur dans esp<br/><br/>
     - <+20> ... <+30>
       - Call atoi() avec la valeur dans esp (argv[1]) et stocke son retour dans eax
       - Comparaison entre eax (le retour de atoi) et 0x1a7 (423)
       - Jump à <+152> si le cmp n'est pas vrai<br/><br/>
     - <+32> ... <+48>
-      - Stocke l'adresse 0x80c5348 à l'adresse de esp
+      - Stocke l'adresse 0x80c5348 dans esp
         - `x/s 0x80c5348`
           - 0x80c5348:	 "/bin/sh"
             - esp contient l'adresse de "/bin/sh"
       - Call strdup avec la valeur à l'adresse de esp et stocke son retour dans eax
-      - Stocke la valeur de eax (le retour de strdup) dans la stack (esp + 16)
+      - Stocke la valeur de eax (le retour de strdup) dans la stack (à esp + 16)
       - Stocke un pointeur NULL dans la stack (esp + 20)<br/><br/>
     - <+56> ... <+70>
-      - Call getgid() et stocke son retour dans la stack (esp + 28)
-      - Call getuid() et stocke son retour dans la stack (esp + 24)<br/><br/>
+      - Call getgid() et stocke son retour dans la stack (à esp + 28)
+      - Call getuid() et stocke son retour dans la stack (à esp + 24)<br/><br/>
     - <+74> ... <+97>
-      - Stocke la valeur à esp + 28 (le retour de getgid) plusieurs fois dans la stack (esp, esp + 4, esp + 8)
+      - Stocke la valeur à esp + 28 (le retour de getgid) plusieurs fois dans la stack (à esp, esp + 4 et esp + 8)
       - Call setresgid() avec les parametres stockés dans la stack<br/><br/>
     - <+102> ... <+125>
-      - Stocke la valeur à esp + 24 (le retour de getuid) plusieurs fois dans la stack (esp, esp + 4, esp + 8)
+      - Stocke la valeur à esp + 24 (le retour de getuid) plusieurs fois dans la stack (à esp, esp + 4 et esp + 8)
       - Call setresgid() avec les parametres stockés dans la stack<br/><br/>
     - <+130> ... <+145>
       - Stocke l'adresse de esp + 16 dans eax
-      - Stocke l'adresse de eax dans la stack (esp + 4)
-      - Stocke l'adresse 0x80c5348 (l'adresse de la string "/bin/sh") dans la stack (esp)
+      - Stocke l'adresse de eax dans la stack (à esp + 4)
+      - Stocke l'adresse 0x80c5348 (l'adresse de la string "/bin/sh") dans la stack (à esp)
       - Call execv() avec les parametres stockés la stack<br/><br/>
     - <+150>
       - Jump à <+192><br/><br/>
@@ -114,10 +114,10 @@
       - Stocke la valeur à l'adresse 0x80c5350 dans eax
         - `x/s 0x80c5350`
           - `0x80c5350:	 "No !\n"`
-      - Stocke la valeur de edx (stderr) dans la stack (esp + 12)
-      - Stocke 0x5 (5) dans la stack (esp + 8)
-      - Stocke 0x1 (1) dans la stack (esp + 4)
-      - Stocke la valeur de eax ("No !\n") dans la stack (esp)
+      - Stocke la valeur de edx (stderr) dans la stack (à esp + 12)
+      - Stocke 0x5 (5) dans la stack (à esp + 8)
+      - Stocke 0x1 (1) dans la stack (à esp + 4)
+      - Stocke la valeur de eax ("No !\n") dans la stack (à esp)
       - Call fwrite() avec les parametres stockés dans la stack<br/><br/>
     - <+192> ... <+198>   (Jump inconditionnel depuis <+150>)
       - réinitialisation de la mémoire, fin d'exécution<br/><br/>
