@@ -97,7 +97,7 @@
       - Stocke dans eax la valeur de l'adresse 0x804988c dans le data segment register
         - `x/s 0x804988c`
           - `0x804988c <m>:	 ""`
-      - Compare la valeur de eax (m ?) avec 0x40 (64)
+      - Compare la valeur de eax (la globale m) avec 0x40 (64)
       - Jump à <+116> si la comparaison est fausse<br/><br/>
     - <+64> ... <+99>
       - Stocke dans eax la valeur de l'adresse 0x8049880 dans le data segment register
@@ -119,5 +119,15 @@
       - Call system() avec l'argument stocké sur la stack<br/><br/>
     - <+116> ... <+117> <= Jump conditionnel depuis <+62>
       - Réinitialisation de la mémoire, fin d'exécution
-    
+
+Du coup la fontion v(): (buffer = ebp - 520)
+  - Call fgets(buffer, 512, stdin)
+  - Call printf(buffer)
+  - Compare la globale m avec 64
+    - Jump direct à la fin si la comparaison est fausse
+    - sinon:
+      - Call fwrite("Wait, what?\n", 1, 12, stdout)
+      - Call system("/bin/sh")
+
+
 ## Exploit
