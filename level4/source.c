@@ -11,7 +11,7 @@ int p(char *buffer)
 
 int n()
 {
-	char	buffer[520];
+	char buffer[520];
 
 	fgets(buffer, 512, stdin);
 	p(buffer);
@@ -21,7 +21,7 @@ int n()
 	return (0);
 }
 
-int main(int argc, char **argv)
+int main()
 {
 	n();
 	return (0);
