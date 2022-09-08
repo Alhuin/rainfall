@@ -129,5 +129,13 @@ Du coup la fontion v(): (buffer = ebp - 520)
       - Call fwrite("Wait, what?\n", 1, 12, stdout)
       - Call system("/bin/sh")
 
-
 ## Exploit
+
+On comprend grâce à l'analyse que pour pouvoir avoir notre shell il va falloir donner à la globale 'm' (à l'adresse 0x804988c) la valeur 64, sinon on sort direct du programme.
+
+On fait appel à deux fonctions avant la comparaison:
+- fgets(buffer, 512, stdin), qui est protégé d'un buffer overflow puisqu'il ne lira jamais plus de 511 octets
+- printf(buffer), ici par contre le printf est vulnérable à un [exploit de format string](https://www.exploit-db.com/papers/23985) !
+  - on va s'en servir pour écrire 64 dans la globale m et passer le cmp à <+59>
+
+
