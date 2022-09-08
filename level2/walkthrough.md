@@ -22,12 +22,11 @@
   - `info function`
     ```asm
     [...]
-      0x080484b0  frame_dummy
       0x080484d4  p
       0x0804853f  main
     [...]
     ```
-    - on trouve une fonction p et une fonction frame_dummy en plus du main
+    - on trouve une fonction p en plus du main
   - `disas main`
     ```asm
     Dump of assembler code for function main:
@@ -140,12 +139,18 @@ On sait qu'il y a un buffer overflow possible sur le gets, cependant le check au
 Après quelques recherches dans les fonctions importées par le programme, on trouve un call à eax dans frame_dummy:
 
 - `gdb level2`
-  - `disas frame_dummy`
-    - ```asm
-      [...]
-        0x080484cf <+31>:	call   eax
-      [...]
-      ```
+  - `info function`
+    ```asm
+    [...]
+      0x080484b0  frame_dummy
+    [...]
+    ``` 
+    - `disas frame_dummy`
+      - ```asm
+        [...]
+          0x080484cf <+31>:	call   eax
+        [...]
+        ```
 Puisque le strdup() stocke son output dans eax, en théorie on peut écrire un exploit dans l'input du gets() et utiliser l'adresse du call eax découvert dans frame_dummy (`0x080484cf`) pour réécrire l'EIP et faire exécuter notre exploit depuis eax !
 
 On va se servir d'un [générateur de pattern](https://wiremask.eu/tools/buffer-overflow-pattern-generator/) pour trouver l'offset plus rapidement:
