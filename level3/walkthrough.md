@@ -22,12 +22,11 @@
   - `info function`
     ```asm
     [...]
-      0x08048480  frame_dummy
       0x080484a4  v
       0x0804851a  main
     [...]
     ```
-    - on trouve une fonction v et une fonction frame_dummy en plus du main
+    - on trouve une fonction v en plus du main
   - `disas main`
     ```asm
     Dump of assembler code for function main:
@@ -39,7 +38,14 @@
       0x08048526 <+12>:	ret
     End of assembler dump.
     ```
-
+    - <+0> ... <+3>
+      - Initialisation de la mémoire, alignement de la stack<br/><br/>
+    - <+6>
+      - Call la fonction v()<br/><br/>
+    - <+11> ... <+12>
+      - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
+    - La fonction main() ne fait rien d'autre qu'appeler v()<br/><br/>
+    
   - `disas v`
     ```asm
     Dump of assembler code for function v:
