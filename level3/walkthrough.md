@@ -120,14 +120,6 @@
     - <+116> ... <+117> <= Jump conditionnel depuis <+62>
       - Réinitialisation de la mémoire, fin d'exécution
 
-Du coup la fontion v(): (buffer = ebp - 520)
-  - Call fgets(buffer, 512, stdin)
-  - Call printf(buffer)
-  - Compare la globale m avec 64
-    - Jump direct à la fin si la comparaison est fausse
-    - sinon:
-      - Call fwrite("Wait, what?\n", 1, 12, stdout)
-      - Call system("/bin/sh")
 
 ## Exploit
 
