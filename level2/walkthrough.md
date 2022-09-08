@@ -146,11 +146,11 @@ Après quelques recherches dans les fonctions importées par le programme, on tr
     [...]
     ``` 
     - `disas frame_dummy`
-      - ```asm
-        [...]
-          0x080484cf <+31>:	call   eax
-        [...]
-        ```
+      ```asm
+      [...]
+        0x080484cf <+31>:	call   eax
+      [...]
+      ```
 Puisque le strdup() stocke son output dans eax, en théorie on peut écrire un exploit dans l'input du gets() et utiliser l'adresse du call eax découvert dans frame_dummy (`0x080484cf`) pour réécrire l'EIP et faire exécuter notre exploit depuis eax !
 
 On va se servir d'un [générateur de pattern](https://wiremask.eu/tools/buffer-overflow-pattern-generator/) pour trouver l'offset plus rapidement:
@@ -158,11 +158,11 @@ On va se servir d'un [générateur de pattern](https://wiremask.eu/tools/buffer-
 - `echo "Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag" > /tmp/exploit`
 - `gdb level2`
   - `run < /tmp/exploit`
-  ```
-  Program received signal SIGSEGV, Segmentation fault.
-  0x37634136 in ?? ()
-  ```
-  - on rentre 0x37634136 dans le générateur de pattern et il nous donne un offset de 80.
+    ```
+    Program received signal SIGSEGV, Segmentation fault.
+    0x37634136 in ?? ()
+    ```
+    - on rentre 0x37634136 dans le générateur de pattern et il nous donne un offset de 80.
 
 Nous créons donc un payload à l'aide du shellcode trouvé dans le lien suivant : http://shell-storm.org/shellcode/files/shellcode-219.php
 
