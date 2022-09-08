@@ -109,8 +109,11 @@
       - Réinitialisation de la mémoire, fin d'exécution
     - <+18> ... <+25>
       - Stocke 0x1 (1) sur la stack
-      - Call exit() avec l'argument stocké sur la stack
+      - Call _exit() avec l'argument stocké sur la stack
 
 ## Exploit
 
 Ni main() ni n() n'appellent o(), dommage car il nous pop un shell. On remarque également qu'il n'y a pas de return(), uniquement des call à exit() donc impossible de réécrire l'eip.
+
+- diff exit() vs _exit() ?
+- modifier exit pour le faire pointer sur o() avec printf ?
