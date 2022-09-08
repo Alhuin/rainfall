@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int		m = 0;
+int m = 0;
 
-int		v()
+int v()
 {
-	char	buffer[520];
+	char buffer[520];
 
 	fgets(buffer, 512, stdin);
 	printf(buffer);
@@ -17,7 +17,7 @@ int		v()
 	return (0);
 }
 
-int		main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	v();
 	return (0);
