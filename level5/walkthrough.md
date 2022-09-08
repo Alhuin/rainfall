@@ -115,7 +115,7 @@
 
 Ni main() ni n() n'appellent o(), dommage car il nous pop un shell.
 On remarque également qu'il n'y a pas de return(), uniquement des call à exit() donc inutile de réécrire l'eip on va sortir sans y passer.
-Il va falloir remplacer l'adresse de la fonction exit() dans le Global Offset Table par l'adresse de la fonction o() pour avoir notre shell.
+Il va falloir [remplacer l'adresse de la fonction exit() dans la Global Offset Table par l'adresse de la fonction o()](https://axcheron.github.io/exploit-101-format-strings/#code-execution-redirect) pour avoir notre shell.
 
 
 - `objdump -R level5`
@@ -131,7 +131,7 @@ Il va falloir remplacer l'adresse de la fonction exit() dans le Global Offset Ta
  08049838 R_386_JUMP_SLOT   exit
  0804983c R_386_JUMP_SLOT   __libc_start_main
  ```
- - l'adresse d'exit dans le GOT est `08049838`
+ - l'adresse d'exit dans la GOT est `08049838`
 - `gdb level5`
   - `info function o`
     ```
