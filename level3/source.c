@@ -14,11 +14,11 @@ int v()
 		fwrite("Wait what?!\n", 12, 1, stdout);
 		system("/bin/sh");
 	}
-	return (0);
+	return(0);
 }
 
 int main()
 {
 	v();
-	return (0);
+	return(0);
 }

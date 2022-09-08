@@ -6,7 +6,7 @@ int m = 0;
 int p(char *buffer)
 {
 	printf(buffer);
-	return (0);
+	return(0);
 }
 
 int n()
@@ -18,11 +18,11 @@ int n()
 	if (m == 16930116) {
     system("/bin/cat /home/user/level5/.pass");
   }
-	return (0);
+	return(0);
 }
 
 int main()
 {
 	n();
-	return (0);
+	return(0);
 }

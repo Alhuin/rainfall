@@ -19,5 +19,5 @@ char *p() {
 
 int main() {
     p();
-    return 0;
+    return(0);
 }
