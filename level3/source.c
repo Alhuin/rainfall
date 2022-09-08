@@ -3,7 +3,7 @@
 
 int m = 0;
 
-int v()
+int v(void)
 {
 	char buffer[520];
 
@@ -17,7 +17,7 @@ int v()
 	return(0);
 }
 
-int main()
+int main(void)
 {
 	v();
 	return(0);

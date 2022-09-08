@@ -17,7 +17,7 @@ char *p() {
     return(strdup(buffer));
 }
 
-int main() {
+int main(void) {
     p();
     return(0);
 }
