@@ -6,7 +6,7 @@
     -rwsr-x---+ 1 level1 users  747441 Mar  6  2016 level0  
   [...]
   ```
-    - On a un binaire appartenant a level1 dans le home avec les droits SUID
+  - On a un binaire appartenant a level1 dans le home avec les droits SUID
 
 - `./level0`
   ```
@@ -132,7 +132,7 @@ On comprend donc que la fonction main attend un argument, va exécuter atoi dess
       level1
     ```
 
-- `cat /home/user/level1/.pass`
-  ```
-    1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a
-  ```
+  - `cat /home/user/level1/.pass`
+    ```
+      1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a
+    ```
