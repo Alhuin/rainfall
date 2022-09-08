@@ -78,5 +78,46 @@
       0x08048519 <+117>:	ret
     End of assembler dump.
     ```
+    - <+0> ... <+3>
+      - Initialisation de la mémoire (libère 536 octets pour la stack)<br/><br/>
+    - <+9> ... <+35>
+      - Stocke dans eax la valeur de l'adresse 0x8049860 dans le data segment register
+        - `x/s 0x8049860`
+          - `0x8049860 <stdin@@GLIBC_2.0>:	 ""`
+      - Stocke la valeur de eax (stdin) dans la stack (à esp + 8)
+      - Stocke 0x200 (512) dans la stack (à esp + 4)
+      - Stocke dans eax la valeur à ebp - 520 => esp + 16
+      - Stocke la valeur de eax (valeur à l'adresse ebp - 520) dans la stack (à esp)
+      - Call fgets() avec les arguments stockés dans la stack<br/><br/>
+    - <+40> ... <+49>
+      - Fait pointer eax sur ebp - 520 => l'adresse du retour de fgets()
+      - Stocke eax (l'adresse ebp - 520) sur la stack (à esp)
+      - Call printf avec l'argument stocké sur la stack<br/><br/>
+    - <+54> ... <+62>
+      - Stocke dans eax la valeur de l'adresse 0x804988c dans le data segment register
+        - `x/s 0x804988c`
+          - `0x804988c <m>:	 ""`
+      - Compare la valeur de eax (m ?) avec 0x40 (64)
+      - Jump à <+116> si la comparaison est fausse<br/><br/>
+    - <+64> ... <+99>
+      - Stocke dans eax la valeur de l'adresse 0x8049880 dans le data segment register
+        - `x/s 0x8049880`
+          - `0x8049880 <stdout@@GLIBC_2.0>:	 " ", <incomplete sequence \375\267>`
+      - Stocke eax dans edx
+      - Stocke dans eax la valeur de l'adresse 0x8048600
+        - `x/s 0x8048600`
+          - `0x8048600:	 "Wait what?!\n"`
+      - Stocke edx (stdout) sur la stack (à esp + 12)
+      - Stocke 0xc (12) sur la stack (à esp + 8)
+      - Stocke 0x1 (1) sur la stack (à esp + 4)
+      - Stocke la valeur de eax ("Wait what?!\n") sur la stack (à esp)
+      - Call fwrite() avec les arguments stockés sur la stack<br/><br/>
+    - <+104> ... <+111>
+      - Stocke la valeur à l'adresse 0x804860d sur la stack (à esp)
+        - `x/s 0x804860d`
+          - `0x804860d:	 "/bin/sh"`
+      - Call system() avec l'argument stocké sur la stack<br/><br/>
+    - <+116> ... <+117> <= Jump conditionnel depuis <+62>
+      - Réinitialisation de la mémoire, fin d'exécution
     
 ## Exploit
