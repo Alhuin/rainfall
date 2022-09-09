@@ -74,24 +74,24 @@
     - <+0> ... <+3>
       - Initialisation de la mémoire (libère 24 octets pour la stack et aligne la mémoire)<br/><br/>
     - <+6> ... <+41>
-      - Stocke la valeur dans le registre data segment à l'adresse 0x80497c0 dans eax, puis dans edx
+      - Stocke la valeur du registre data segment 0x80497c0 dans eax, puis dans edx
         - `x/s 0x80497c0`
           - `0x80497c0 <stdout@@GLIBC_2.0>:	 ""`
-      - Stocke la valeur à l'adresse 0x8048570 dans eax
+      - Stocke la valeur de 0x8048570 dans eax
         - `x/s 0x8048570`
           - `0x8048570:	 "Good... Wait what?\n"`
-      - Stocke la valeur de edx (stdout) dans la stack (à esp + 12)
-      - Stocke 0x13 (19) dans la stack (à esp + 8)
-      - Stocke 0x1 (1) dans la stack (à esp + 4)
-      - Stocke la valeur de eax dans la stack (à esp)
-      - Call fwrite() avec les arguments stockés dans la stack<br/><br/>
+      - Stocke la valeur de edx (stdout) sur la stack (à esp + 12)
+      - Stocke 0x13 (19) sur la stack (à esp + 8)
+      - Stocke 0x1 (1) sur la stack (à esp + 4)
+      - Stocke la valeur de sur dans la stack (à esp)
+      - Call fwrite() avec les arguments stockés sur la stack<br/><br/>
     - <+46> ... <+53>
-      - Stocke la valeur à l'adresse 0x8048584 dans la stack (à esp)
+      - Stocke la valeur de 0x8048584 sur la stack (à esp)
         - `x/s 0x8048584`
           - `0x8048584:	 "/bin/sh"`
-      - Call system() avec l'argument stocké dans la stack<br/><br/>
+      - Call system() avec l'argument stocké sur la stack<br/><br/>
     - <+58> ... <+59>
-      - réinitialisation de la mémoire, fin d'exécution<br/><br/>
+      - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
     - La fonction run affiche "Good... Wait what?\n" sur la sortie standard et lance un shell via la commande system()
 
 ## Exploit
