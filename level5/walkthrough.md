@@ -68,18 +68,18 @@
     - <+0> ... <+3>
       - Initialisation de la mémoire (libère 536 octets pour la stack)<br/><br/>
     - <+9> ... <+35>
-      - Stocke dans eax la valeur de l'adresse 0x8049848 dans le data segment register
+      - Stocke dans eax la valeur du data segment register 0x8049848
         - `x/s 0x8049848`
           - `0x8049848 <stdin@@GLIBC_2.0>:	 ""`
-      - Stocke la valeur de eax (stdin) dans la stack (à esp + 8)
-      - Stocke 0x200 (512) dans la stack (à esp + 4)
+      - Stocke la valeur de eax (stdin) sur la stack (à esp + 8)
+      - Stocke 0x200 (512) sur la stack (à esp + 4)
       - Fait pointer eax sur ebp - 520
-      - Stocke eax (l'adresse ebp - 520) dans la stack (à esp)
-      - Call fgets() avec les arguments stockés dans la stack<br/><br/>
+      - Stocke eax (l'adresse ebp - 520) sur la stack (à esp)
+      - Call fgets() avec les arguments stockés sur la stack<br/><br/>
     - <+40> ... <+49>
       - Fait pointer eax sur ebp - 520 => l'adresse du retour de fgets()
       - Stocke eax (l'adresse du retour de fgets()) sur la stack (à esp)
-      - Call printf avec l'argument stocké sur la stack<br/><br/>
+      - Call printf() avec l'argument stocké sur la stack<br/><br/>
     - <+54> ... <+61>
       - Stocke 0x1 (1) sur la stack
       - Call exit() avec l'argument stocké sur la stack
