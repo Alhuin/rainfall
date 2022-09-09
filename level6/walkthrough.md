@@ -89,7 +89,7 @@
       - Call strcpy() avec les arguments stockés sur la stack<br/><br/>
     - <+78> ... <+84>
       - Stocke la valeur à esp + 24 (le malloc(4) contenant l'adresse de m()) dans eax
-      - Stocke la valeur de eax (l'adresse de m()) dans eax
+      - Stocke la valeur à l'adresse de eax (l'adresse de m()) dans eax
       - Call eax (donc call m())
     - <+86> ... <+87>
       - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
