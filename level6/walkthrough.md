@@ -90,8 +90,63 @@
     - <+78> ... <+84>
       - Stocke la valeur à esp + 24 (le malloc(4) contenant l'adresse de m()) dans eax
       - Stocke la valeur à l'adresse de eax (l'adresse de m()) dans eax
-      - Call eax (donc call m())
+      - Call eax (donc call m())<br/><br/>
     - <+86> ... <+87>
       - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
-      
+
+  - `disas m`
+    ```asm
+    Dump of assembler code for function m:
+       0x08048468 <+0>:	push   ebp
+       0x08048469 <+1>:	mov    ebp,esp
+       0x0804846b <+3>:	sub    esp,0x18
+       0x0804846e <+6>:	mov    DWORD PTR [esp],0x80485d1
+       0x08048475 <+13>:	call   0x8048360 <puts@plt>
+       0x0804847a <+18>:	leave
+       0x0804847b <+19>:	ret
+    End of assembler dump.
+    ```
+    - <+0> ... <+3>
+      - Initialisation de la mémoire (libère 24 octets pour la stack)<br/><br/>
+    - <+6> ... <+13>
+      - Stocke la valeur de 0x80485d1 sur la stack (à esp)
+        - `x/s 0x80485d1`
+          ```
+          0x80485d1:	 "Nope"
+          ```
+      - Call puts() avec l'argument stocké sur la stack<br/><br/>
+    - <+18> ... <+19>
+      - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
+
+  - `disas n`
+    ```asm
+    Dump of assembler code for function n:
+       0x08048454 <+0>:	push   ebp
+       0x08048455 <+1>:	mov    ebp,esp
+       0x08048457 <+3>:	sub    esp,0x18
+       0x0804845a <+6>:	mov    DWORD PTR [esp],0x80485b0
+       0x08048461 <+13>:	call   0x8048370 <system@plt>
+       0x08048466 <+18>:	leave
+       0x08048467 <+19>:	ret
+    End of assembler dump.
+    ```
+    - <+0> ... <+3>
+      - Initialisation de la mémoire (libère 24 octets pour la stack)<br/><br/>
+    - <+6> ... <+13>
+      - Stocke la valeur de 0x80485b0 sur la stack (à esp)
+        - `x/s 0x80485b0`
+          ```
+          0x80485b0:	 "/bin/cat /home/user/level7/.pass"
+          ```
+      - Call system() avec l'argument stocké sur la stack<br/><br/>
+    - <+18> ... <+19>
+      - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
+
 ## Exploit
+
+La fonction main() fait deux appels à malloc():
+- malloc(64) où on va venir copier notre input avec strcpy
+- malloc(4) oû on va stocker l'adresse de la fonction à exécuter à <main+84> (en l'occurence l'adresse de m())
+
+La fonction m() affiche "Nope" et la fonction n() (qui n'est pas appelée) affiche le contenu du fichier .pass, on comprend que l'on va devoir profiter de [la vulérabilité de strcpy() à un buffer overflow](https://www.cisa.gov/uscert/bsi/articles/knowledge/coding-practices/strcpy-and-strcat) pour venir écrire l'adresse de n() dans le malloc(4).
+
