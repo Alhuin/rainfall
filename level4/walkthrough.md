@@ -73,26 +73,26 @@
     - <+0> ... <+3>
       - Initialisation de la mémoire (libère 536 octets pour la stack)<br/><br/>
     - <+9> ... <+35>
-      - Stocke dans eax la valeur de l'adresse 0x8049804 dans le data segment register
+      - Stocke dans eax la valeur du data segment register 0x8049804
         - `x/s 0x8049804`
           - `0x8049804 <stdin@@GLIBC_2.0>:	 ""`
-      - Stocke la valeur de eax (stdin) dans la stack (à esp + 8)
-      - Stocke 0x200 (512) dans la stack (à esp + 4)
+      - Stocke la valeur de eax (stdin) sur la stack (à esp + 8)
+      - Stocke 0x200 (512) sur la stack (à esp + 4)
       - Fait pointer eax sur ebp - 520
-      - Stocke eax (l'adresse ebp - 520) dans la stack (à esp)
-      - Call fgets() avec les arguments stockés dans la stack<br/><br/>
+      - Stocke eax (l'adresse ebp - 520) sur la stack (à esp)
+      - Call fgets() avec les arguments stockés sur la stack<br/><br/>
     - <+40> ... <+49>
       - Fait pointer eax sur ebp - 520 => l'adresse du retour de fgets()
       - Stocke eax (l'adresse du retour de fgets()) sur la stack (à esp)
       - Call la fonction p() avec l'argument stocké sur la stack<br/><br/>
     - <+54> ... <+73>
-      - Stocke dans eax la valeur de l'adresse 0x8049810 dans le data segment register
+      - Stocke dans eax la valeur du data segment register 0x8049810
         - `x/s 0x8049810`
           - `0x8049810 <m>:	 ""`
       - Compare eax (la valeur de la globale m) avec 0x1025544 (16930116)
         - Jump à <+78> si la comparaison est fausse
         - sinon:
-          - Stocke la la valeur à l'adresse 0x8048590 sur la stack (à esp)
+          - Stocke la la valeur de 0x8048590 sur la stack (à esp)
             - `x/s 0x8048590`
               ```
               0x8048590:	 "/bin/cat /home/user/level5/.pass"
