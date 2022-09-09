@@ -148,5 +148,6 @@ La fonction main() fait deux appels à malloc():
 - malloc(64) où on va venir copier notre input avec strcpy()
 - malloc(4) oû on va stocker l'adresse de la fonction à exécuter à <main+84> (en l'occurence l'adresse de m())
 
-La fonction m() affiche "Nope" et la fonction n() (qui n'est pas appelée) affiche le contenu du fichier .pass, on comprend que l'on va devoir profiter de [la vulérabilité de strcpy() à un buffer overflow](https://www.cisa.gov/uscert/bsi/articles/knowledge/coding-practices/strcpy-and-strcat) pour venir écrire l'adresse de n() dans le malloc(4).
+La fonction m() affiche "Nope" et la fonction n() affiche le contenu du fichier .pass mais n'est pas appelée, on comprend que l'on va devoir profiter de [la vulérabilité de strcpy() à un buffer overflow](https://www.cisa.gov/uscert/bsi/articles/knowledge/coding-practices/strcpy-and-strcat) pour venir écrire l'adresse de n() dans le malloc(4).
+
 
