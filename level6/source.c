@@ -3,16 +3,16 @@
 #include <stdlib.h>
 
 void n(void) {
-  system("/bin/cat /home/user/level7/.pass");
+	system("/bin/cat /home/user/level7/.pass");
 }
 
 void m(void) {
-  puts("Nope");
+	puts("Nope");
 }
 
-int	main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-	char		*str;
+	char *str;
 	void (*ptr)(void);
 
 	str = malloc(64);
