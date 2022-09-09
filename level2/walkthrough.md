@@ -84,15 +84,15 @@
     - <+0> ... <+3>
       - Initialisation de la mémoire (libère 104 octets pour la stack)<br/><br/>
     - <+6> ... <+14>
-      - Stocke la valeur dans le registre data segment à l'adresse 0x80497c0 dans eax
+      - Stocke la valeur du registre data segment 0x80497c0 dans eax
         - `x/s 0x8049860`
           - `0x8049860 <stdout@@GLIBC_2.0>:	 ""`
-      - Stocke la valeur de eax (stdout) dans la stack (à esp)
-      - Call fflush() avec l'argument stocké dans la stack<br/><br/>
+      - Stocke la valeur de eax (stdout) sur la stack (à esp)
+      - Call fflush() avec l'argument stocké sur la stack<br/><br/>
     - <+19> ... <+25>
       - Fait pointer eax sur ebp - 76
-      - Stocke eax (l'adresse de ebp - 76) dans la stack (à esp)
-      - Call gets() avec l'argument stocké dans la stack<br/><br/>
+      - Stocke eax (l'adresse de ebp - 76) sur la stack (à esp)
+      - Call gets() avec l'argument stocké sur la stack<br/><br/>
     - <+30> ... <+49>
       - Stocke l'adresse ebp + 4 (l'eip) dans eax
       - Stocke eax (l'adresse de l'eip) dans ebp - 12
@@ -100,24 +100,24 @@
       - Compare la nouvelle valeur de eax avec 0xb0000000
       - Jump à <p +83> si la comparaison n'est pas vraie<br/><br/>
     - <+51> ... <+66>
-      - Stocke la valeur à l'adresse 0x8048620 dans eax
+      - Stocke la valeur de 0x8048620 dans eax
         - `x/s 0x8048620`
           - `0x8048620:	 "(%p)\n"`
       - Stocke la valeur à ebp - 12 (l'adresse de l'eip) dans edx
-      - Stocke la valeur de edx dans la stack (à esp + 4)
-      - Stocke la valeur de eax ("(%p)\n") dans la stack (à esp)
-      - Call printf() avec les arguments stockés dans la stack<br/><br/>
+      - Stocke la valeur de edx sur la stack (à esp + 4)
+      - Stocke la valeur de eax ("(%p)\n") sur la stack (à esp)
+      - Call printf() avec les arguments stockés sur la stack<br/><br/>
     - <+71> ... <+78>
-      - Stocke 0x1 (1) dans la stack (à esp)
-      - Call exit() avec l'argument stocké dans la stack<br/><br/>
+      - Stocke 0x1 (1) sur la stack (à esp)
+      - Call exit() avec l'argument stocké sur la stack<br/><br/>
     - <+83> ... <+89> (Jump conditionnel depuis <+49>)
       - Fait pointer eax sur ebp - 76 (le retour du gets)
-      - Stocke eax (ebp - 76) dans la stack (à esp)
-      - Call puts() avec l'argument stocké dans la stack<br/><br/>
+      - Stocke eax (ebp - 76) sur la stack (à esp)
+      - Call puts() avec l'argument stocké sur la stack<br/><br/>
     - <+94> ... <+100>
       - Fait pointer eax sur ebp - 76 (le retour du gets)
-      - Stocke eax (ebp - 76) dans la stack (à esp)
-      - Call strdup() avec l'argument stocké dans la stack<br/><br/>
+      - Stocke eax (ebp - 76) sur la stack (à esp)
+      - Call strdup() avec l'argument stocké sur la stack<br/><br/>
     - <+105> ... <+106>
       - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
 
