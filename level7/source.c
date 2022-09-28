@@ -24,5 +24,7 @@ int main(int argc, char **argv) {
   strcpy(b[1], argv[2]);
   
   fgets(c, 68, fopen("/home/user/level8/.pass", "r"));
+  puts("~~");
+  
   return(0);
 }
