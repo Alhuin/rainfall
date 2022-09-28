@@ -95,6 +95,86 @@
       0x08048602 <+225>:	ret
     End of assembler dump.
     ```
+    - <+0> ... <+6>
+      - Initialisation de la mémoire (libère 32 octets pour la stack), alignement de la stack<br/><br/>
+    - <+9> ... <+21>
+      - Stocke 0x8 (8) sur la stack (à esp)
+      - Call malloc() avec l'argument stocké sur la stack
+      - Stocke eax (l'adresse du malloc, disons a = malloc(8)) sur la stack (à esp + 28)<br/><br/>
+    - <+25> ... <+47>
+      - Stocke 0x1 (1) dans eax (a[0] = 1)
+      - Stocke 0x8 (8) sur la stack (à esp)
+      - Call malloc() avec l'argument stocké sur la stack
+      - Stocke eax (l'adresse du second malloc, disons b = malloc(8)) dans edx<br/><br/>
+    - <+49> ... <+68>
+      - Stocke la valeur à esp + 28 (l'adresse du premier malloc, donc a) dans eax
+      - Stocke edx (l'adresse du second malloc b) dans eax + 4 (donc a[0] = 1; a[1] = b = malloc(8))
+      - Stocke 0x8 (8) sur la stack (à esp)
+      - Call malloc() avec l'argument stocké sur la stack
+      - Stocke eax (l'adresse du troisieme malloc, disons c = malloc(8)) sur la stack (à esp + 24)<br/><br/>
+    - <+72> ... <+94>
+      - Stocke la valeur à esp + 24 (l'adresse du troisième malloc, donc c) dans eax
+      - Stocke 0x2 (2) dans eax (c[0] = 2)
+      - Stocke 0x8 (8) sur la stack (à esp)
+      - Call malloc() avec l'argument stocké sur la stack
+      - Stocke eax (l'adresse du quatrième malloc, disons d = malloc(8)) dans edx<br/><br/>
+    - <+96> ... <+111>
+      - Stocke la valeur à esp + 24 (l'adresse du troisième malloc, donc c) dans eax
+      - Stocke edx (l'adresse du quatrieme malloc, d) à eax + 4 (c[1] = d = malloc(8))
+      - Fait pointer eax à ebp + 12 (argv)
+      - Déplace eax sur argv[1] (eax + 4)
+      - Stocke la valeur à l'adresse contenue dans eax (argv[1]) dans eax
+      - Stocke eax (argv[1]) dans edx<br/><br/>
+    - <+113> ... <+127>
+      - Fait pointer eax sur esp + 28 (l'adresse du premier malloc a)
+      - Ajoute 4 à l'adresse portée par eax (eax = a[1])
+      - Stocke edx (argv[1]) sur la stack (à esp + 4)
+      - Stocke eax (a[1]) sur la stack (à esp)
+      - Call strcpy() avec les arguments stockés sur la stack (eax = strcpy(a[1], argv[1]);)<br/><br/>
+    - <+132> ... <+156>
+      - Fait pointer eax sur ebp + 12 (argv)
+      - Déplace eax sur argv[2] (eax + 8)
+      - Stocke la valeur à l'adresse contenue dans eax (argv[2]) dans eax
+      - Stocke eax (argv[2]) dans edx
+      - Stocke l'adresse contenue a esp + 24 (l'adresse du 3eme malloc c) dans eax
+      - Déplace eax sur c[1] (eax + 4)
+      - Stocke edx (argv[2]) sur la stack (à esp + 4)
+      - Stocke eax (c[1]) sur la stack (à esp)
+      - Call strcpy() avec les arguments stockés sur la stack (eax = strcpy(c[1], argv[2]);)<br/><br/>
+    - <+161> ... <+178>
+      - Stocke la valeur à 0x80486e9 dans edx
+        - `x/s 0x80486e9`
+          ```asm
+          0x80486e9:	 "r"
+          ```
+      - Stocke la valeur à 0x80486eb dans eax
+        - `x/s 0x80486e9`
+          ```asm
+          0x80486eb:	 "/home/user/level8/.pass"
+          ```
+      - Stocke edx ("/home/user/level8/.pass")sur la stack (à esp + 4)
+      - Stocke eax ("r") sur la stack (à esp)
+      - Call fopen() avec les arguments stockés sur la stack (eax = fopen("r", "/home/user/level8/.pass");)<br/><br/>
+    - <+183> ... <+202>
+      - Stocke eax (le retour du fopen()) sur la stack (à esp + 8)
+      - Stocke 0x44 (68) sur la stack (à esp + 4)
+      - Stocke la valeur à 0x8049960 sur la stack (à esp)
+        - `x/s 0x8049960`
+          ```asm
+          0x8049960 <c>:	 ""
+          ```
+      - Call fgets() avec les arguments stockés sur la stack (eax = fgets(c, 68, &fopen_return))<br/><br/>
+    - <+207> ... <+219>
+      - Stocke la valeur à 0x8048703 sur la stack (à esp)
+        - `x/s 0x8048703`
+          ```asm
+          0x8048703:	 "~~"
+          ```
+      - Call puts() avec l'argument stocké sur la stack (eax = puts("~~"))
+      - Stocke 0x0 (0) dans eax (ca sera la valeur return par la fonction main())
+    - <+224> ... <+225>
+      - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
+
   - `disas m`
     ```asm
     Dump of assembler code for function m:
