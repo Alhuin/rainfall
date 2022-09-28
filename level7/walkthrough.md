@@ -201,15 +201,15 @@
     - <+25> ... <+47>
       - Stocke la valeur à 0x80486e0 dans edx
         - `x/s 0x80486e0`
-        ```asm
-        0x80486e0:	 "%s - %d\n"
-        ```
+          ```asm
+          0x80486e0:	 "%s - %d\n"
+          ```
       - Stocke eax (le retour de time(0)) sur la stack (à esp + 8)
       - Stocke la valeur à 0x8049960 sur la stack (à esp + 4)
         - `x/s 0x8049960`
-        ```asm
-        0x8049960 <c>:	 ""
-        ```
+          ```asm
+          0x8049960 <c>:	 ""
+          ```
       - Stocke edx ("%s - %d\n") sur la stack
       - Call printf avec les arguments stockés sur la stack (eax = printf("%s - %d\n", c, time(0));)<br/><br/>
     - <+43> ... <+44>
