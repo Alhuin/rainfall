@@ -152,9 +152,9 @@
           ```asm
           0x80486eb:	 "/home/user/level8/.pass"
           ```
-      - Stocke edx ("/home/user/level8/.pass")sur la stack (à esp + 4)
-      - Stocke eax ("r") sur la stack (à esp)
-      - Call fopen() avec les arguments stockés sur la stack (eax = fopen("r", "/home/user/level8/.pass");)<br/><br/>
+      - Stocke edx ("r")sur la stack (à esp + 4)
+      - Stocke eax ("/home/user/level8/.pass") sur la stack (à esp)
+      - Call fopen() avec les arguments stockés sur la stack (eax = fopen("/home/user/level8/.pass", "r");)<br/><br/>
     - <+183> ... <+202>
       - Stocke eax (le retour du fopen()) sur la stack (à esp + 8)
       - Stocke 0x44 (68) sur la stack (à esp + 4)
@@ -192,3 +192,25 @@
        0x08048520 <+44>:	ret
     End of assembler dump.
     ```
+    - <+0> ... <+3>
+      - Initialisation de la mémoire (libère 24 octets pour la stack)<br/><br/>
+    - <+6> ... <+13>
+      - Stocke 0x0 (0) sur la stack (à esp)
+      - Call time() avec l'argument stocké sur la stack (eax = time(0);)
+      - Stocke eax (l'adresse du malloc, disons a = malloc(8)) sur la stack (à esp + 28)<br/><br/>
+    - <+25> ... <+47>
+      - Stocke la valeur à 0x80486e0 dans edx
+        - `x/s 0x80486e0`
+        ```asm
+        0x80486e0:	 "%s - %d\n"
+        ```
+      - Stocke eax (le retour de time(0)) sur la stack (à esp + 8)
+      - Stocke la valeur à 0x8049960 sur la stack (à esp + 4)
+        - `x/s 0x8049960`
+        ```asm
+        0x8049960 <c>:	 ""
+        ```
+      - Stocke edx ("%s - %d\n") sur la stack
+      - Call printf avec les arguments stockés sur la stack (eax = printf("%s - %d\n", c, time(0));)<br/><br/>
+    - <+43> ... <+44>
+      - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
