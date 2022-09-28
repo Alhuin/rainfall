@@ -167,7 +167,60 @@
        0x08048738 <+468>:	ret
     End of assembler dump.
     ```
-    - <+0> ... <+6>
-
+    - <+0> ... <+8>
+      - Initialisation de la mémoire:
+        - push ebp sur la stack
+        - déplace ebp sur le nouvel esp
+        - push les [Destination et Source Indexes](https://stackoverflow.com/questions/1856320/purpose-of-esi-edi-registers) (EDI, ESI)
+        - aligne la mémoire et libère 160 octects pour la stack<br/><br/>
+    - <+14> ... <+16>
+      - JMP à <+17>
+      - No operation<br/><br/>
+    - <+17> ... <+45>
+      - Stocke dans ecx la valeur du data segment register 0x8049ab0
+        - `x/s 0x8049ab0`
+          ```asm
+          0x8049ab0 <service>:	 ""
+          ```
+      - Stocke dans edx la valeur du data segment register 0x8049aac
+        - `x/s 0x8049aac`
+          ```asm
+          0x8049aac <auth>:	 ""
+          ```
+      - Stocke la valeur à 0x8048810 dans eax
+        - `x/s 0x8048810`
+        ```asm
+        0x8048810:	 "%p, %p \n"
+        ```
+      - Place ecx (la globale <service>) sur la stack (à esp + 8)
+      - Place edx (la globale <auth>) sur la stack (à esp + 4)
+      - Place eax ("%p, %p \n") sur la stack (à esp)
+      - Call printf() avec les arguments stockés sur la stack (eax = printf("%p, %p \n", auth, service))
+    - <+50> ... <+74>
+      - Stocke dans eax la valeur du data segment register 0x8049a80
+      - `x/s 0x8049a80`
+        ```asm
+        0x8049a80 <stdin@@GLIBC_2.0>:	 ""
+        ```
+      - Place eax (<stdin>) sur la stack (à esp + 8)
+      - Place 0x80 (128) sur la stack (à esp + 4)
+      - Fait pointer eax sur esp + 32
+      - Place eax (l'adresse de esp+32) sur la stack (à esp)
+      - Call fgets avec les arguments stockés sur la stack (eax = fgets(&esp+32, 128, stdin))
+    - <+79> ... <+81>
+      - Jump à <+456> si eax (le retour de fgets) vaut 0
+    - <+87> ... <+107>
+      - Fait pointer eax sur esp + 32
+      - Copie eax (&esp+32) dans edx
+      - Stocke la valeur à 0x8048819 dans eax
+        - `x/s 0x8048819`
+        ```asm
+        0x8048819:	 "auth "
+        ```
+      - Stocke 0x5 (5) dans ecx
+      - Set le destination index sur edx (5)
+      - Set de source index sur eax ("auth")
+  
+  
 ## Exploit
 
