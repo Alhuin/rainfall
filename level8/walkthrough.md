@@ -209,7 +209,7 @@
       - Call fgets avec les arguments stockés sur la stack (eax = fgets(&esp+32, 128, stdin))
     - <+79> ... <+81>
       - Jump à <+456> si eax (le retour de fgets) vaut 0
-    - <+87> ... <+107>
+    - <+87> ... <+126>
       - Fait pointer eax sur esp + 32
       - Copie eax (&esp+32) dans edx
       - Stocke la valeur à 0x8048819 dans eax
@@ -218,9 +218,26 @@
         0x8048819:	 "auth "
         ```
       - Stocke 0x5 (5) dans ecx
-      - Set le destination index sur edx (5)
-      - Set de source index sur eax ("auth")
-  
-  
+      - Stocke edx (le buffer a &esp + 32) dans esi (le source index)
+      - Stocke eax ("auth ") dans edi (le destination index)
+      - repz [cmps](https://www.tutorialspoint.com/assembly_programming/assembly_cmps_instruction.htm)
+        - cmps effectue une comparaison bit à bit entre les deux uint_t pointés par uint_t *esi et uint_t *edi
+        - le préfixe repz indique d'incrémenter esi et sdi et de refaire le cmps tant que les uint_t pointés sont égaux et que ecx-- est > 0, c'est grossièrement l'équivalent d'un strcnp
+        - les fonctions seta (set if above) et setb (set if below) vont respectivement set dl et et al avec un booleen représentant l'écart au premier uint_t différent entre edi et esi
+          - seta dl => dl = 1 if *esi > *edi else 0
+          - setb al => al = 1 if *esi < *edi else 0
+        - Stocke edx dans ecx (reset ecx to 5)
+        - Soustrait al à cl
+        - Stocke ecx (5) dans eax
+        - Copie le contenu du registre 8 bits (al) dans le registre 32 bits (eax) avec une extension de signe
+        - Conditional Jump if eax != 0 to <+222>
+      - On peut vulgariser cette partie en tant que:
+        ```c
+        if (strncmp(input, "atuth ", 5) == 0) {
+          [...]
+        }
+        <+222>
+        ```
+    - <+128> ... <+217>
 ## Exploit
 
