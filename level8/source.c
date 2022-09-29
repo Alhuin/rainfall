@@ -16,7 +16,7 @@ int main(void) {
         if (strncmp(input, "auth ", 5) == 0) {
             auth = malloc(4);
             auth[0] = 0;
-            if (strlen(input + 5) > 30) {
+            if (strlen(input + 5) <= 30) {
                 strcpy(auth, buffer + 5);
             }
         }
