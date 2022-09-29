@@ -374,3 +374,15 @@
       - Réinitialisation de la mémoire, fin d'exécution
                                           
 ## Exploit
+
+Après l'analyse de ce (~trop~ très) long main ( •̀ - •́ ) ***angry norminette noises*** ( •̀ - •́ ), on comprend plusieurs choses:
+- On peut interagir avec le programme avec différentes commandes:
+  - "auth "
+    - si l'input qui suit la commande est moins long que 30 caractères, copie son contenu dans la globale <auth>
+  - "reset"
+    - free la gloable <auth>
+  - "service"
+    - strdup l'input qui suit la commande dans la globale <service>
+  - "login"
+    - si le 33eme caractere de la globale auth != 0, pop un shell avec la commande system()
+    - sinon, écrit "Password:\n" sur la sortie standard
