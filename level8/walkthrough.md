@@ -195,7 +195,7 @@
       - Place ecx (la globale <service>) sur la stack (à esp + 8)
       - Place edx (la globale <auth>) sur la stack (à esp + 4)
       - Place eax ("%p, %p \n") sur la stack (à esp)
-      - Call printf() avec les arguments stockés sur la stack (eax = printf("%p, %p \n", auth, service))
+      - Call printf() avec les arguments stockés sur la stack (eax = printf("%p, %p \n", auth, service))<br/><br/>
     - <+50> ... <+74>
       - Stocke dans eax la valeur du data segment register 0x8049a80
         - `x/s 0x8049a80`
@@ -206,9 +206,9 @@
       - Place 0x80 (128) sur la stack (à esp + 4)
       - Fait pointer eax sur esp + 32
       - Place eax (l'adresse de esp+32) sur la stack (à esp)
-      - Call fgets avec les arguments stockés sur la stack (eax = fgets(&esp+32, 128, stdin))
+      - Call fgets avec les arguments stockés sur la stack (eax = fgets(&esp+32, 128, stdin))<br/><br/>
     - <+79> ... <+81>
-      - Jump à <+456> si eax (le retour de fgets) vaut 0
+      - Jump à <+456> si eax (le retour de fgets) vaut 0<br/><br/> <= Avec ce JMP à l'instruction No Op à <+456>, on sort de notre boucle infinie (cf plus bas)
     - <+87> ... <+126>
       - Fait pointer eax sur esp + 32
       - Copie eax (&esp+32) dans edx
@@ -237,7 +237,7 @@
           [...]
         }
         <+222>
-        ```
+        ```<br/><br/>
     - <+128> ... <+196>
       - Stocke 0x4 (4) sur la stack (à esp)
       - Call malloc() avec l'argument stocké sur la stack (eax = malloc(4)) et l'assigne à la valeur du data segment register 0x8049aac
@@ -265,14 +265,14 @@
           [...]
         }
         <+222>
-        ```
+        ```<br/><br/>
     - <+198> ... <+217>
       - Fait pointer eax sur esp + 32 (input)
       - Fait pointer edx sur eax + 5 (input + 5)
       - Stocke dans eax la valeur du data segment register 0x8049aac (<auth>)
       - Stocke edx (input + 5) sur la stack (à esp + 4)
       - Stocke eax (auth) sur la stack (à esp)
-      - Call strcpy() avec les arguments stockés sur la stack (eax = strcpy(auth, input + 5))
+      - Call strcpy() avec les arguments stockés sur la stack (eax = strcpy(auth, input + 5))<br/><br/>
     - <+222> ... <+261>
       - Même principe que de <+128> ... <+217>: 
         - On compare les 5 premiers caractères de notre input avec la valeur à 0x804881f:
@@ -287,11 +287,11 @@
             [...]
           }
           <+276>
-          ```
+          ```<br/><br/>
     - <+263> ... <+271>
       - Stocke dans eax la valeur du data segment register 0x8049aac (<auth>)
       - Stocke eax (auth) sur la stack (à esp)
-      - Call free() avec l'argument stocké sur la stack (eax = free(auth))
+      - Call free() avec l'argument stocké sur la stack (eax = free(auth))<br/><br/>
     - <+276> ... <+315>
       - Même principe que de <+128> ... <+217> et <+222> ... <+261>:
         - On compare les 6 premiers caractères de notre input avec la valeur à 0x8048825:
@@ -306,4 +306,68 @@
             [...]
           }
           <+337>
+          ```<br/><br/>
+    - <+317> ... <+332>
+      - Fait pointer eax sur esp +32 (input)
+      - Ajoute 7 à eax (input + 7)
+      - Stocke eax (input + 7) sur la stack (à esp)
+      - Call strdup() avec l'argument stocké sur la stack (eax = strdup(input + 7))
+      - Stocke eax dans le data segment register 0x8049ab0 (<service>)<br/><br/>
+    - <+337> ... <+376>
+      - Même principe que de <+128> ... <+217>, <+222> ... <+261> et <+276> ... <+315>:
+        - On compare les 5 premiers caractères de notre input avec la valeur à 0x804882d:
+          - `x/s 0x8048825`
+            ```
+            0x804882d:	 "login"
+            ```
+        - Puis on Jump conditionnellement à <+16> si eax (le résultat du strncmp) est différent de 0 <= Avec ce JMP à l'instruction No Op à <+16>, on crée une boucle infinie
+        - En C:
+          ```c
+          if (strncmp(input, "login", 5) == 0) {
+            [...]
+          }
+          <+16>
+          ```<br/><br/>
+    - <+382> ... <+392>
+      - Stocke dans eax la valeur du data segment register 0x8049aac (<auth>)
+      - Stocke dans eax la valeur à eax + 20 (auth[32])
+      - Jump conditionnel à <+411> si eax == 0
+      - En C:
+        ```c
+        if (auth[32] != 0) {
+          [...]
+        }
+        <+ 411>
+        ```
+    - <+394> ... <+406>
+      - Stocke la valeur à 0x8048833 sur la stack (à esp)
+        - `x/s 0x8048833`
           ```
+          0x8048833:	 "/bin/sh"
+          ```
+      - Call system() avec l'argument stocké sur la stack (eax = system("/bin/sh"))
+      - Unconditional Jump a <+16>  <= Avec ce JMP à l'instruction No Op à <+16>, on crée une boucle infinie
+    - <+411> ... <+451>
+      - Stocke dans eax la valeur du data segment register 0x8049aa0
+        - `x/s 0x8049aa0`
+          ```
+          0x8049aa0 <stdout@@GLIBC_2.0>:	 ""
+          ```
+      - Stocke eax (stdout) dans edx
+      - Stocke la valeur à 0x804883b dans eax
+        - `x/s 0x804883b`
+          ```
+          0x804883b:	 "Password:\n"
+          ```
+      - Stocke edx (stdout) sur la stack (à esp + 12)
+      - Stocke 0xa (10) sur la stack (à esp + 8)
+      - Stocke 0x1 (1) sur la stack (à esp + 4)
+      - Stocke eax ("Password:\n") sur la stack (à esp)
+      - Call fwrite() avec les les arguments stockés sur la stack (eax = fwrtite("Password:\n", 1, 10, stdout))
+      - Unconditional Jump a <+16>
+    - <+456> ... <+468>
+      - No Operation
+      - Stocke 0x0 (0) dans eax (la valeur qui sera return)
+      - Réinitialisation de la mémoire, fin d'exécution
+                                          
+## Exploit
