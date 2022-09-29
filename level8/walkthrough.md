@@ -292,3 +292,18 @@
       - Stocke dans eax la valeur du data segment register 0x8049aac (<auth>)
       - Stocke eax (auth) sur la stack (à esp)
       - Call free() avec l'argument stocké sur la stack (eax = free(auth))
+    - <+276> ... <+315>
+      - Même principe que de <+128> ... <+217> et <+222> ... <+261>:
+        - On compare les 6 premiers caractères de notre input avec la valeur à 0x8048825:
+          - `x/s 0x8048825`
+            ```
+            0x8048825:	 "service"
+            ```
+        - Puis on Jump conditionnellement à <+337> si eax (le résultat du strncmp) est différent de 0
+        - En C:
+          ```c
+          if (strncmp(input, "service", 6) == 0) {
+            [...]
+          }
+          <+337>
+          ```
