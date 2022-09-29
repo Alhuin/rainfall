@@ -6,9 +6,9 @@
     -rwsr-s---+ 1 level9 users  6057 Mar  6  2016 level8
   [...]
   ```
-    - On a un binaire appartenant a level8 dans le home avec les droits SUID.
+    - On a un binaire appartenant a level9 dans le home avec les droits SUID.
 
-- `./level6`
+- `./level8`
   ```
   (nil), (nil)
   
