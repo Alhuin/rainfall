@@ -208,7 +208,8 @@
       - Place eax (l'adresse de esp+32) sur la stack (à esp)
       - Call fgets avec les arguments stockés sur la stack (eax = fgets(&esp+32, 128, stdin))<br/><br/>
     - <+79> ... <+81>
-      - Jump à <+456> si eax (le retour de fgets) vaut 0<br/><br/> <= Avec ce JMP à l'instruction No Op à <+456>, on sort de notre boucle infinie (cf plus bas)
+      - Jump à <+456> si eax (le retour de fgets) vaut 0
+        - Avec ce JMP à l'instruction No Op à <+456>, on sort de notre boucle infinie (cf plus bas)<br/><br/>
     - <+87> ... <+126>
       - Fait pointer eax sur esp + 32
       - Copie eax (&esp+32) dans edx
@@ -237,7 +238,7 @@
           [...]
         }
         <+222>
-        ```<br/><br/>
+        ```
     - <+128> ... <+196>
       - Stocke 0x4 (4) sur la stack (à esp)
       - Call malloc() avec l'argument stocké sur la stack (eax = malloc(4)) et l'assigne à la valeur du data segment register 0x8049aac
@@ -265,7 +266,7 @@
           [...]
         }
         <+222>
-        ```<br/><br/>
+        ```
     - <+198> ... <+217>
       - Fait pointer eax sur esp + 32 (input)
       - Fait pointer edx sur eax + 5 (input + 5)
@@ -287,7 +288,7 @@
             [...]
           }
           <+276>
-          ```<br/><br/>
+          ```
     - <+263> ... <+271>
       - Stocke dans eax la valeur du data segment register 0x8049aac (<auth>)
       - Stocke eax (auth) sur la stack (à esp)
@@ -306,7 +307,7 @@
             [...]
           }
           <+337>
-          ```<br/><br/>
+          ```
     - <+317> ... <+332>
       - Fait pointer eax sur esp +32 (input)
       - Ajoute 7 à eax (input + 7)
@@ -320,14 +321,15 @@
             ```
             0x804882d:	 "login"
             ```
-        - Puis on Jump conditionnellement à <+16> si eax (le résultat du strncmp) est différent de 0 <= Avec ce JMP à l'instruction No Op à <+16>, on crée une boucle infinie
+        - Puis on Jump conditionnellement à <+16> si eax (le résultat du strncmp) est différent de 0
+          - Avec ce JMP à l'instruction No Op à <+16>, on crée une boucle infinie
         - En C:
           ```c
           if (strncmp(input, "login", 5) == 0) {
             [...]
           }
           <+16>
-          ```<br/><br/>
+          ```
     - <+382> ... <+392>
       - Stocke dans eax la valeur du data segment register 0x8049aac (<auth>)
       - Stocke dans eax la valeur à eax + 20 (auth[32])
@@ -346,7 +348,8 @@
           0x8048833:	 "/bin/sh"
           ```
       - Call system() avec l'argument stocké sur la stack (eax = system("/bin/sh"))
-      - Unconditional Jump a <+16>  <= Avec ce JMP à l'instruction No Op à <+16>, on crée une boucle infinie
+      - Unconditional Jump a <+16>
+        - Avec ce JMP à l'instruction No Op à <+16>, on crée une boucle infinie<br/><br/>
     - <+411> ... <+451>
       - Stocke dans eax la valeur du data segment register 0x8049aa0
         - `x/s 0x8049aa0`
@@ -364,7 +367,7 @@
       - Stocke 0x1 (1) sur la stack (à esp + 4)
       - Stocke eax ("Password:\n") sur la stack (à esp)
       - Call fwrite() avec les les arguments stockés sur la stack (eax = fwrtite("Password:\n", 1, 10, stdout))
-      - Unconditional Jump a <+16>
+      - Unconditional Jump a <+16><br/><br/>
     - <+456> ... <+468>
       - No Operation
       - Stocke 0x0 (0) dans eax (la valeur qui sera return)
