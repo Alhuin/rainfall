@@ -198,10 +198,10 @@
       - Call printf() avec les arguments stockés sur la stack (eax = printf("%p, %p \n", auth, service))
     - <+50> ... <+74>
       - Stocke dans eax la valeur du data segment register 0x8049a80
-      - `x/s 0x8049a80`
-        ```asm
-        0x8049a80 <stdin@@GLIBC_2.0>:	 ""
-        ```
+        - `x/s 0x8049a80`
+          ```asm
+          0x8049a80 <stdin@@GLIBC_2.0>:	 ""
+          ```
       - Place eax (<stdin>) sur la stack (à esp + 8)
       - Place 0x80 (128) sur la stack (à esp + 4)
       - Fait pointer eax sur esp + 32
@@ -231,13 +231,38 @@
         - Stocke ecx (5) dans eax
         - Copie le contenu du registre 8 bits (al) dans le registre 32 bits (eax) avec une extension de signe
         - Conditional Jump if eax != 0 to <+222>
-      - On peut vulgariser cette partie en tant que:
+      - En C:
         ```c
         if (strncmp(input, "atuth ", 5) == 0) {
           [...]
         }
         <+222>
         ```
-    - <+128> ... <+217>
-## Exploit
-
+    - <+128> ... <+196> (le contenu du if)
+      - Stocke 0x4 (4) sur la stack (à esp)
+      - Call malloc() avec l'argument stocké sur la stack (eax = malloc(4)) et l'assigne à la valeur du data segment register 0x8049aac
+        - `x/s 0x8049aac`
+          ```asm
+          0x8049aac <auth>:	 ""
+          ```
+          (auth = malloc(4))
+      - Stocke 0x0 (0) dans la valeur pointée par eax (auth[0] = 0)
+      - Fait pointer eax sur esp + 32 (notre input)
+      - ajoute 5 à eax (eax pointe sur input + 5)
+      - Stocke 0xffffffff (-1) sur la stack (à esp + 28)
+      - Stocke eax (&input+5) dans edx
+      - Stocke 0x0 (0) dans eax
+      - Stocke la valeur à esp + 28 (-1) dans ecx
+      - Stocke edx (&input+5) dans edi
+      - [repnz scas](https://stackoverflow.com/questions/26783797/repnz-scas-assembly-instruction-specifics) de edi (équivalent en C à ecx = strlen(edi))
+      - Stocke ecx (strlen(input + 5)) dans eax
+      - [bitwise not](https://www.felixcloutier.com/x86/not) sur eax et soustraction de 1
+      - Compare eax avec 30
+      - Conditional Jump if above, si eax > 30 jump à <+222>
+      - En C:
+        ```c
+        if (strlen(input + 5) <= 30) {
+          [...]
+        }
+        <+222>
+        ```
