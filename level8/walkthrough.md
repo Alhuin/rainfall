@@ -238,7 +238,7 @@
         }
         <+222>
         ```
-    - <+128> ... <+196> (le contenu du if)
+    - <+128> ... <+196>
       - Stocke 0x4 (4) sur la stack (à esp)
       - Call malloc() avec l'argument stocké sur la stack (eax = malloc(4)) et l'assigne à la valeur du data segment register 0x8049aac
         - `x/s 0x8049aac`
@@ -266,3 +266,25 @@
         }
         <+222>
         ```
+    - <+198> ... <+217>
+      - Fait pointer eax sur esp + 32 (input)
+      - Fait pointer edx sur eax + 5 (input + 5)
+      - Stocke dans eax la valeur du data segment register 0x8049aac (<auth>)
+      - Stocke edx (input + 5) sur la stack (à esp + 4)
+      - Stocke eax (auth) sur la stack (à esp)
+      - Call strcpy() avec les arguments stockés sur la stack (eax = strcpy(auth, input + 5))
+  - <+222> ... <+261>
+      - Même principe que de <+128> ... <+217>: 
+        - On compare les 5 premiers caractères de notre input avec la valeur à 0x804881f:
+          - `x/s 0x804881f`
+            ```
+            0x804881f:	 "reset"
+            ```
+        - Puis on Jump conditionnellement à <+276> si eax (le résultat du strncmp) est différent de 0
+        - En C:
+          ```c
+          if (strncmp(input, "reset", 5) == 0) {
+            [...]
+          }
+          <+276>
+          ```
