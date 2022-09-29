@@ -273,7 +273,7 @@
       - Stocke edx (input + 5) sur la stack (à esp + 4)
       - Stocke eax (auth) sur la stack (à esp)
       - Call strcpy() avec les arguments stockés sur la stack (eax = strcpy(auth, input + 5))
-  - <+222> ... <+261>
+    - <+222> ... <+261>
       - Même principe que de <+128> ... <+217>: 
         - On compare les 5 premiers caractères de notre input avec la valeur à 0x804881f:
           - `x/s 0x804881f`
@@ -288,3 +288,7 @@
           }
           <+276>
           ```
+    - <+263> ... <+271>
+      - Stocke dans eax la valeur du data segment register 0x8049aac (<auth>)
+      - Stocke eax (auth) sur la stack (à esp)
+      - Call free() avec l'argument stocké sur la stack (eax = free(auth))
