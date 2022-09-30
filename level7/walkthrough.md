@@ -233,12 +233,12 @@ On va dessiner la heap en se servant du debugging dans le fichier source:
   ```
   
   a	(0xbffff718)	=	0x804b008
-  a[0]	(0x804b008)	=	0x1
+  a[0]	(0x804b008)	=	1
   a[1]	(0x804b00c)	=	0x804b018
 
 
   b	(0xbffff71c)	=	0x804b028
-  b[0]	(0x804b028)	=	0x2
+  b[0]	(0x804b028)	=	2
   b[1]	(0x804b02c)	=	0x804b038
 
   strcpy(0x804b018, aaaa)
