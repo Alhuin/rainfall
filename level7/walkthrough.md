@@ -280,7 +280,7 @@ Du debug a été ajouté au fichier source.c
     1
   ------------------------ 0x804b008 (&a, a[0]) ---------------------------
   ```
-- On veut overflow depuis 0x804b018 jusqu'à écrire dans 0x804b02c, donc avec 20 * "A" + "BBBB" en argv[1], on obtient cette heap:
+- On veut overflow depuis 0x804b018 jusqu'à écrire dans 0x804b02c, donc avec 20 * "A" + "BBBB" en argv[1], on obtient:
   ```
   ------------------------ 0x804b040 -------------------------------------
     malloc de b[1]
