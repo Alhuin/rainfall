@@ -228,8 +228,8 @@ Pour cela, nous allons exploiter le fait que les strcpy() ne soient pas protég�
 
 ### Explications
 
-On va dessiner la heap en se servant du debugging dans le fichier source:
-- On copie le source.c dans tmp, on le gdb et on lance `./a.out aaaa bbbb`:
+Du debug a été ajouté au fichier source.c
+- On le copie sur la vm, on le gdb et on lance `./a.out aaaa bbbb`:
   ```
   
   a	(0xbffff718)	=	0x804b008
@@ -254,7 +254,7 @@ On va dessiner la heap en se servant du debugging dans le fichier source:
   
   strcpy(0x804b038, bbbb)
   ```
-- En dessinant la heap:
+- Représentation de la heap:
   ```
   ------------------------ 0x804b040 -------------------------------------
     malloc de b[1]
