@@ -13,11 +13,11 @@
   ```
   - Avec ou sans arguments, le programme n'affiche rien.
 
-- `./level9 Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag`
+- `./level9 $(python -c 'print "A" * 200')`
   ```
   Segmentation fault (core dumped)
   ```
-  - SegFault avec une string de 100 (ou moins, on cherchera l'offset tout a l'heure)
+  - SegFault avec une string de 200 (ou moins, on cherchera l'offset tout a l'heure)
 
 - `gdb level9`
   - `set disassembly-flavor intel`
@@ -98,7 +98,7 @@
     End of assembler dump.
     ```
   - `disas 'N::setAnnotation(char*)'`
-    ```
+    ```asm
     Dump of assembler code for function _ZN1N13setAnnotationEPc:
        0x0804870e <+0>:	push   ebp
        0x0804870f <+1>:	mov    ebp,esp
@@ -132,18 +132,18 @@
     End of assembler dump.
     ```
   - `disas 'N::operator-(N&)'`
-  ```asm
-  Dump of assembler code for function _ZN1NmiERS_:
-     0x0804874e <+0>:	push   ebp
-     0x0804874f <+1>:	mov    ebp,esp
-     0x08048751 <+3>:	mov    eax,DWORD PTR [ebp+0x8]
-     0x08048754 <+6>:	mov    edx,DWORD PTR [eax+0x68]
-     0x08048757 <+9>:	mov    eax,DWORD PTR [ebp+0xc]
-     0x0804875a <+12>:	mov    eax,DWORD PTR [eax+0x68]
-     0x0804875d <+15>:	mov    ecx,edx
-     0x0804875f <+17>:	sub    ecx,eax
-     0x08048761 <+19>:	mov    eax,ecx
-     0x08048763 <+21>:	pop    ebp
-     0x08048764 <+22>:	ret
-  End of assembler dump.
-  ```
+    ```asm
+    Dump of assembler code for function _ZN1NmiERS_:
+       0x0804874e <+0>:	push   ebp
+       0x0804874f <+1>:	mov    ebp,esp
+       0x08048751 <+3>:	mov    eax,DWORD PTR [ebp+0x8]
+       0x08048754 <+6>:	mov    edx,DWORD PTR [eax+0x68]
+       0x08048757 <+9>:	mov    eax,DWORD PTR [ebp+0xc]
+       0x0804875a <+12>:	mov    eax,DWORD PTR [eax+0x68]
+       0x0804875d <+15>:	mov    ecx,edx
+       0x0804875f <+17>:	sub    ecx,eax
+       0x08048761 <+19>:	mov    eax,ecx
+       0x08048763 <+21>:	pop    ebp
+       0x08048764 <+22>:	ret
+    End of assembler dump.
+    ```
