@@ -1,9 +1,11 @@
 Class N {
 public:
     int value;
+    void function() {};
     char annotation[100];
         
     N(int n){
+        this->function = N::operator+;
         this->value = n;
     }
 
