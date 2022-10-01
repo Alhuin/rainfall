@@ -114,4 +114,5 @@
     - Appel execl("/bin/sh", "sh", NULL)<br/><br/>
   - <+122>...<+128>
     - Return 0
-    - Réinitialisation de la mémoire, fin d'exécution<br/><>
+    - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
+## Exploit
