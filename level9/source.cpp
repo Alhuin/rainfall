@@ -34,5 +34,5 @@ int main(int argc, char **argv)
    b = new N(6);  
   
    a->setAnnotation(argv[1]);  
-   return (b + a);  
+   return (b->function(a));  
 }
