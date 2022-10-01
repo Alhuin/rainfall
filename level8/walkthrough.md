@@ -223,7 +223,7 @@
       - Stocke eax ("auth ") dans edi (le destination index)
       - repz [cmps](https://www.tutorialspoint.com/assembly_programming/assembly_cmps_instruction.htm)
         - cmps effectue une comparaison bit à bit entre les deux uint_t pointés par uint_t *esi et uint_t *edi
-        - le préfixe repz indique d'incrémenter esi et sdi et de refaire le cmps tant que les uint_t pointés sont égaux et que ecx-- est > 0, c'est grossièrement l'équivalent d'un strcnp
+        - le préfixe repz indique d'incrémenter esi et edi et de refaire le cmps tant que les uint_t pointés sont égaux et que ecx-- est > 0, c'est grossièrement l'équivalent d'un strcnp
         - les fonctions seta (set if above) et setb (set if below) vont respectivement set dl et et al avec un booleen représentant l'écart au premier uint_t différent entre edi et esi
           - seta dl => dl = 1 if *esi > *edi else 0
           - setb al => al = 1 if *esi < *edi else 0
