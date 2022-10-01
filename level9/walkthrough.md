@@ -154,8 +154,17 @@
        0x0804870c <+22>:	ret
     End of assembler dump.
     ```
-    - Set this->operator+ comme la premiere entrée de la [virtualtable](https://en.wikipedia.org/wiki/Virtual_method_table#Multiple_inheritance_and_thunks)
-    - assigne argv[1] a la première property (&argv + 68) => this->value = argv[1]
+    - <+0> ... <+1>
+      - Initialisation de la mémoire<br/><br/>
+    - <+3> ... <+6>
+      - Stocke ebp + 8 (l'adresse de notre instance) dans eax
+      - Assigne la méthode operator+ à this->function, la première entrée dans la [virtualtable](https://en.wikipedia.org/wiki/Virtual_method_table#Multiple_inheritance_and_thunks)<br/><br/>
+    - <+12> ... <+18>
+      - Stocke ebp + 8 (l'adresse de notre instance) dans eax
+      - Stocke ebp +12 (le deuxieme argument: nb) dans edx
+      - Stocke edx (nb) dans &this + 104 (this->value = nb)<br/><br/>
+    - <+21> ... <+22>
+      - Réinitialisation de la mémoire, fin d'exécution.<br/><br/>
   - `disas 'N::setAnnotation(char*)'`
     ```asm
     Dump of assembler code for function _ZN1N13setAnnotationEPc:
@@ -190,7 +199,17 @@
        0x0804874c <+18>:	ret
     End of assembler dump.
     ```
-    - return (&argv + 68) + (&argv1 + 68) == this->value + argv[1]->value
+    - <+0> ... <+1>
+      - Initialisation de la mémoire<br/><br/>
+    - <+3> ... <+15>
+      - Stocke ebp + 8 (l'adresse de notre instance) dans eax
+      - Stocke eax (l'adresse de notre instance) + 104 (this->value) dans edx
+      - Stocke ebp +12 (l'adresse de l'autre instance) dans eax
+      - Stocke eax (l'adresse de l'autre instance) + 104 (other.value) dans eax
+      - Add edx a eax (eax = this->value + other.value)
+    - <+17> ... <+18>
+      - Return eax (this->value + other->value)
+      - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
   - `disas 'N::operator-(N&)'`
     ```asm
     Dump of assembler code for function _ZN1NmiERS_:
@@ -207,4 +226,7 @@
        0x08048764 <+22>:	ret
     End of assembler dump.
     ```
-    - return (&argv + 68) - (&argv1 + 68) == this->value - argv[1]->value
+    - Exactement pareil que operator+(), mais avec un sub plutot qu'un add:
+      - return (this->value - other.value)<br/><br/>
+
+## Exploit
