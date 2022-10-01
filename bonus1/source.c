@@ -2,7 +2,7 @@ int main(int argc, char **argv)
 {
     char b[40];
 
-    a = atoi(argv[1]);
+    int a = atoi(argv[1]);
     if (a > 9)
         return (1);
     memcpy(b, argv[2], a*4);
