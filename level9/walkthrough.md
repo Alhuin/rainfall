@@ -185,6 +185,20 @@
        0x08048739 <+43>:	ret
     End of assembler dump.
     ```
+    - <+0> ... <+3>
+      - Initialisation de la mémoire, libère 24 octets pour la stack<br/><br/>
+    - <+6> ... <+12>
+      - Stocke ebp + 12 (argv[1], notre char *str) dans eax et le place sur la stack (à esp)
+      - Call strlen() avec l'argument stocké sur la stack(eax = strlen(str))<br/><br/>
+    - <+17> ... <+37>
+      - Stocke ebp + 8 (argv[0], l'adresse de notre instance) dans edx
+      - Décale edx de 4 octets pour pointer sur this->annotation
+      - Stocke eax (strlen(str)) sur la stack (à esp + 8)
+      - Stocke ebp + 12 (argv[1], notre char *str) dans eax puis le place sur la stack (à esp + 4)
+      - Stocke edx (this->annotation) sur la stack (à esp)
+      - Call memcpy() avec les arguments placés sur la stack (eax = memcpy(this->annotation, str, strlen(str)))<br/><br/>
+    - <+42> ... <+43>
+      - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
   - `disas 'N::operator+(N&)'`
     ```asm
     Dump of assembler code for function _ZN1NplERS_:
@@ -206,7 +220,7 @@
       - Stocke eax (l'adresse de notre instance) + 104 (this->value) dans edx
       - Stocke ebp +12 (l'adresse de l'autre instance) dans eax
       - Stocke eax (l'adresse de l'autre instance) + 104 (other.value) dans eax
-      - Add edx a eax (eax = this->value + other.value)
+      - Add edx a eax (eax = this->value + other.value)<br/><br/>
     - <+17> ... <+18>
       - Return eax (this->value + other->value)
       - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
