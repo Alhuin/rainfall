@@ -68,50 +68,50 @@
     End of assembler dump.
     ```
 
-- <+0> ... <+6>
-  - Initialisation de la mémoire (libère 64 octets pour la stack), alignement de la stack<br/><br/>
-- <+9>...<+25>
-  - Prépare les arguments pour l'appel de atoi
-  - Stocke le pointeur de argv (ebp+0xc) dans eax
-  - Ajoute 4 pour atteindre argv[1]
-  - Transfert la valeur de argv[1] dans EAX
-  - Transfert la valeur de argv[1] (EAX) dans ESP
-  - Appel atoi avec argv[1] en argument
-  - Stocke le retour dans esp+0x3c<br/><br/>
-- <+29>...<+34>
-  - Compare le retour du atoi avec la valeur 9
-  - Si la valeur est inferieur ou egale a 9 on jump a l'instruction <main+43><br/><br/>
-- <+36>...<+41>
-  - Met la valeur 1 dans eax pour la préparation du return(1)
-  - Jump à l'instruction <main+127><br/><br/>
-- <+43>...<+79>
-  - Prepare les arguments pour l'appel de memcpy
-  - Stocke le retour de atoi dans EAX
-  - Multiplie le retour de atoi (EAX) par 4 et le stocke dans ECX
-  - Stocke argv dans eax
-  - Ajoute 8 a argv pour arriver sur argv[2]
-  - Stocke la valeur argv[2] (EAX) dans EAX
-  - Stocke argv[2] (EAX) dans EDX
-  - Met la valeur d'un pointeur sur l'espace aloué au debut qui se situe a ESP+14.
-    Qui fait que nous donnons un pointeur sur un char * d'une taille de 0x3c(retour de atoi)- 0x14 (adresse char*) = 40.
-  - Stocke le retour d'atoi * 4 (ECX) en 3eme argument du memcpy
-  - Stocke argv[2] (EDX) en 2eme argument du memcpy
-  - Stocke le pointeur sur le char[40] en premier argument du memcpy
-  - Appel memcpy(char[40], argv[2],  a*4)<br/><br/>
-- <+84>...<+92>
-  - Compare le retour de atoi (ESP+0x3c) avec la valeur 1464814662
-  - Si le retour du atoi n'est pas egale avec cette valeur jump a <main+122><br/><br/>
-- <+94>...<+117>
-  - Prepare les arguments pour l'appel de execl
-  - Stocke 0 en 3eme argument de execl qui est equivalent a NULL comme execl prends des char en argument
-  - `x/10s 0x8048580`
-    ```asm
-    0x8048580:       "sh"
-    0x8048583:       "/bin/sh"
-    ```
-  - Stocke "sh" en 2nd argument
-  - Stocke "/bin/sh" en 1er argument
-  - Appel execl("/bin/sh", "sh", NULL)<br/><br/>
-- <+122>...<+128>
-  - Return 0
-  - Réinitialisation de la mémoire, fin d'exécution<br/><>
+  - <+0> ... <+6>
+    - Initialisation de la mémoire (libère 64 octets pour la stack), alignement de la stack<br/><br/>
+  - <+9>...<+25>
+    - Prépare les arguments pour l'appel de atoi
+    - Stocke le pointeur de argv (ebp+0xc) dans eax
+    - Ajoute 4 pour atteindre argv[1]
+    - Transfert la valeur de argv[1] dans EAX
+    - Transfert la valeur de argv[1] (EAX) dans ESP
+    - Appel atoi avec argv[1] en argument
+    - Stocke le retour dans esp+0x3c<br/><br/>
+  - <+29>...<+34>
+    - Compare le retour du atoi avec la valeur 9
+    - Si la valeur est inferieur ou egale a 9 on jump a l'instruction <main+43><br/><br/>
+  - <+36>...<+41>
+    - Met la valeur 1 dans eax pour la préparation du return(1)
+    - Jump à l'instruction <main+127><br/><br/>
+  - <+43>...<+79>
+    - Prepare les arguments pour l'appel de memcpy
+    - Stocke le retour de atoi dans EAX
+    - Multiplie le retour de atoi (EAX) par 4 et le stocke dans ECX
+    - Stocke argv dans eax
+    - Ajoute 8 a argv pour arriver sur argv[2]
+    - Stocke la valeur argv[2] (EAX) dans EAX
+    - Stocke argv[2] (EAX) dans EDX
+    - Met la valeur d'un pointeur sur l'espace aloué au debut qui se situe a ESP+14.
+      Qui fait que nous donnons un pointeur sur un char * d'une taille de 0x3c(retour de atoi)- 0x14 (adresse char*) = 40.
+    - Stocke le retour d'atoi * 4 (ECX) en 3eme argument du memcpy
+    - Stocke argv[2] (EDX) en 2eme argument du memcpy
+    - Stocke le pointeur sur le char[40] en premier argument du memcpy
+    - Appel memcpy(char[40], argv[2],  a*4)<br/><br/>
+  - <+84>...<+92>
+    - Compare le retour de atoi (ESP+0x3c) avec la valeur 1464814662
+    - Si le retour du atoi n'est pas egale avec cette valeur jump a <main+122><br/><br/>
+  - <+94>...<+117>
+    - Prepare les arguments pour l'appel de execl
+    - Stocke 0 en 3eme argument de execl qui est equivalent a NULL comme execl prends des char en argument
+    - `x/10s 0x8048580`
+      ```asm
+      0x8048580:       "sh"
+      0x8048583:       "/bin/sh"
+      ```
+    - Stocke "sh" en 2nd argument
+    - Stocke "/bin/sh" en 1er argument
+    - Appel execl("/bin/sh", "sh", NULL)<br/><br/>
+  - <+122>...<+128>
+    - Return 0
+    - Réinitialisation de la mémoire, fin d'exécution<br/><>
