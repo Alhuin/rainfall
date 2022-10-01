@@ -280,10 +280,11 @@ L'idée ici sera de mettre l'adresse de notre input dans eax, notre input sera a
 - L'adresse de notre shellcode (4 octets) => adresse de notre input + 4
 - [Notre shellCode](https://www.exploit-db.com/exploits/42428) (24 octets)
 - Padding de (108 - 4 - 24 = 80 octets)
-- L'adresse de notre input
-Ainsi, eax va porter l'adresse de notre input. Lors du déréférencement, le programme va y lire les 4 premiers octets (l'adresse de notre shellcode un plus loin dans l'input) et les stocker en tant qu'adresse dans edx, pour enfin être call à <main +159>. C'est cool, mais pour cela il nous faut l'adresse de notre input ! <br/>
+- L'adresse de notre input<br/>
 
-On pose un breakpoint juste avant que eax ne soit réécrit avec notre input:
+Ainsi, eax va porter l'adresse de notre input. Lors du déréférencement, le programme va y lire les 4 premiers octets (l'adresse de notre shellcode un peu plus loin dans l'input) et les stocker en tant qu'adresse dans edx, pour enfin être call à <main +159>. C'est cool, mais pour cela il nous faut l'adresse de notre input ! <br/>
+
+On pose un breakpoint juste avant que eax ne soit réécrit:
   - `breakpoint * 0x0804867c`
   - `r AAAA`
   - `x $eax`
