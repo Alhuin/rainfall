@@ -128,7 +128,7 @@
       - Stocke esp + 16 (b_ptr) dans eax
       - Déréférence eax et stocke le résultat dans eax (eax = *b_ptr = N(6))
       - Déréférence eax et stocke le résultat dans edx 
-        - edx pointe sur la prèmiere methode de b: operator+()
+        - edx pointe sur la prèmiere méthode dans la virtual table: operator+()
       - Stocke esp + 20 (a_ptr) dans eax
       - Stocke eax (&a) sur la stack (à esp + 4)
       - Stocke esp + 16 (b_ptr) dans eax
@@ -154,7 +154,8 @@
        0x0804870c <+22>:	ret
     End of assembler dump.
     ```
-    - 
+    - Set this->operator+ comme la premiere entrée de la [virtualtable](https://en.wikipedia.org/wiki/Virtual_method_table#Multiple_inheritance_and_thunks)
+    - assigne argv[1] a la première property (&argv + 68) => this->value = argv[1]
   - `disas 'N::setAnnotation(char*)'`
     ```asm
     Dump of assembler code for function _ZN1N13setAnnotationEPc:
@@ -189,6 +190,7 @@
        0x0804874c <+18>:	ret
     End of assembler dump.
     ```
+    - return (&argv + 68) + (&argv1 + 68) == this->value + argv[1]->value
   - `disas 'N::operator-(N&)'`
     ```asm
     Dump of assembler code for function _ZN1NmiERS_:
@@ -205,10 +207,4 @@
        0x08048764 <+22>:	ret
     End of assembler dump.
     ```
-    - <+0> ... <+1>
-      - Initialisation de la mémoire<br/><br/>
-    - <+3> ... <+17>
-      - Fait pointer eax sur ebp + 8 (argv[0], notre instance de classe)
-      - Va chercher sa property value (ebp + 8) + 104 et la stocke dans edx (edx = this->value)
-      - Fait pointer eax sur ebp + 12 (argv[1], la classe en paramètre)
-      - Va chercher sa property value (argv[1] + 104) et la stocke dans eax (eax = N->value)
+    - return (&argv + 68) - (&argv1 + 68) == this->value - argv[1]->value
