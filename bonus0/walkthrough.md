@@ -131,7 +131,45 @@
     End of assembler dump.
     ```
     - <+0> ... <+5>
-      - Initialisation de la mémoire<br/><br/>
+      - Initialisation de la mémoire, libère 80 octets pour la stack<br/><br/>
+    - <+8> ... <+22>
+      - Stocke la valeur à 0x80486a0 sur la stack (à esp + 4)
+        - `x/s 0x80486a0`
+          ```
+          0x80486a0:	 " - "
+          ```
+      - Fait pointer eax sur ebp - 48
+      - Place eax (&ebp - 48) sur la stack (à esp)
+      - Call p() avec les arguments placés sur la stack (p(a_buffer, " - "))<br/><br/>
+    - <+27> ... <+41>
+      - Stocke la valeur à 0x80486a0 (" - ") sur la stack (à esp + 4)
+      - Fait pointer eax sur ebp - 28
+      - Place eax (&ebp - 28) sur la stack (à esp)
+      - Call p() avec les arguments placés sur la stack (p(b_buffer, " - "))<br/><br/>
+    - <+46> ... <+59>
+      - Fait pointer eax sur ebp - 48 (a_buffer)
+      - Stocke eax (a_buffer) sur la stack à esp + 4
+      - Stocke ebp + 8 (&argv, notre buffer alloué dans le main) dans eax
+      - Stocke eax (main_buffer) sur la stack (à esp)
+      - Call strcpy() avec les arguments placés sur la stack (eax = strcpy(main_buffer, a_buffer))<br/><br/>
+    - <+64> ... <+91>
+      - Stocke la valeur à 0x80486a4 dans ebx
+        - `x/s 0x80486a4`
+          ```
+          0x80486a4:	 " "
+          ```
+      - Stocke ebp + 8 dans eax (&argv)
+      - Stocke 0xffffffff (-1) dans ebp - 60
+      - Stocke eax (&argv, main_buffer) dans edx
+      - Stocke 0x0 (0) dans eax
+      - Stocke ebp - 60 (-1) dans ecx
+      - Stock edx (main_buffer) dans edi
+      - Call strlen() sur edi (cf. level8) (ecx = strlen(main_buffer))<br/><br/>
+    - <+93> ... <+103>
+      - Stocke ecx (résultat du strlen) dans eax
+      - Bitwise not sur eax
+      - Enlève 1 à eax (probablement pour le char de fin de string)
+      - Add ebp + 8 (main_buffer) à eax (dafuq ?)
     - <+130> ... <+133>
       - Réinitialisation de la mémoire, fin d'exécution.<br/><br/>
   - `disas p`
