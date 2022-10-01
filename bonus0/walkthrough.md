@@ -22,12 +22,12 @@
       ```
       - Attend un second input
       - `testb`
-      ```
-      testb
-       -
-      testa testb
-      ```
-      - Affiche les inputs
+        ```
+        testb
+         -
+        testa testb
+        ```
+        - Affiche les inputs
 
 - Avec des inputs de 20, le programme SegFault et semble de pas avoir posé de '\0' au premier argument:
   ```
