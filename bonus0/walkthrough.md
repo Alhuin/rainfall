@@ -165,12 +165,21 @@
       - Stocke ebp - 60 (-1) dans ecx
       - Stock edx (main_buffer) dans edi
       - Call strlen() sur edi (cf. level8) (ecx = strlen(main_buffer))<br/><br/>
-    - <+93> ... <+103>
+    - <+93> ... <+106>
       - Stocke ecx (résultat du strlen) dans eax
       - Bitwise not sur eax
       - Enlève 1 à eax (probablement pour le char de fin de string)
-      - Add ebp + 8 (main_buffer) à eax (dafuq ?)
-    - <+130> ... <+133>
+      - Add ebp + 8 (main_buffer) à eax (eax = buffer[len(buffer)]
+      - Stocke ebx (" ") dans edx et remplit le reste de 0 (edx = " 0000...")
+      - Socke dx (les 12 derniers octets de edx) a la valeur de l'adresse de eax (buffer + len(buffer) = "  0")<br/><br/>
+    - <+109> ... <+122>
+      - Fait pointer eax sur ebp - 28 (b_buffer)
+      - Place eax (b_buffer) sur la stack (à esp + 4)
+      - Stocke ebp + 8 (main_buffer) dans eax
+      - Place eax sur la stack (à esp)
+      - Call strcat() avec les arguments placés sur la stack (eax = strcat(main_buffer, b_buffer))<br/><br/>
+    - <+127> ... <+133>
+      - Return eax (le retour du strcat)
       - Réinitialisation de la mémoire, fin d'exécution.<br/><br/>
   - `disas p`
     ```asm
@@ -202,7 +211,31 @@
     End of assembler dump.
     ```
     - <+0> ... <+3>
-      - Initialisation de la mémoire, libère 24 octets pour la stack<br/><br/>
+      - Initialisation de la mémoire, libère 4120 octets pour la stack<br/><br/>
+    - <+9> ... <+15>
+      - Stocke ebp + 12 (&argv1) dans eax
+      - Place eax (&argv1) sur la stack
+      - Call puts() avec l'argument placé sur la stack (eax = puts(" - "))<br/><br/>
+    - <+20> ... <+45>
+      - Place 0x1000 (4096) sur la stack (à esp + 8)
+      - Fait pointer eax sur ebp - 4104 (esp + 16)
+      - Place eax sur la stack (à esp + 4)
+      - Place 0x0 (0) sur la staxk (à esp)
+      - Call read() avec les arguments placés sur la stack (eax = read(0, p_buffer))<br/><br/>
+    - <+50> ... <+67>
+      - Place 0xa (10) sur la stack (à esp + 4)
+      - Fait pointer eax sur ebp - 4104 (p_buffer)
+      - Place eax sur la stack (à esp)
+      - Call strchr() avec les arguments placés sur la stack (eax = strchr(p_buffer, 10))<br/><br/>
+    - <+72> ... <+99>
+      - Stocke 0x0 (0) dans eax
+      - Fait pointer eax sur ebp - 4104 (p_buffer)
+      - Place 0x14 (20) sur la stack (à esp + 8)
+      - Place eax (0) sur la staxk (à esp + 4)
+      - Stocke ebp + 8 (&argv) dans eax
+      - Place eax sur la stack (à esp)
+      - Call stncpy() avec les arguments placés sur la stack (eax = strncpy(argv[0], stdin, 20))<br/><br/>
     - <+104> ... <+105>
+      - Return eax (le return du strncpy)
       - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
 ## Exploit
