@@ -3,7 +3,7 @@
 #include <string.h>
 
 char *p() {
-    char buffer[76]
+    char buffer[64]
     void *eip;
 
     fflush(stdout);

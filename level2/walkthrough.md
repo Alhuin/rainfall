@@ -134,7 +134,7 @@ La fonction p() fait donc:
 
 ## Exploit
 
-On sait qu'il y a un buffer overflow possible sur le gets, cependant le check au niveau de <p+44> nous empêche de réécrire l'EIP pour le faire pointer sur une fonction de la stack comme dans l'exercice précédent, il va falloir trouver un autre moyen de lancer notre exploit.
+On sait qu'il y a un buffer overflow possible sur le gets, cependant le check au niveau de <p+44> nous empêche de réécrire l'EIP pour le faire pointer sur la stack.
 
 Après quelques recherches dans les fonctions importées par le programme, on trouve un call à eax dans frame_dummy:
 

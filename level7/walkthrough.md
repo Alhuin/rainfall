@@ -224,7 +224,7 @@ On note aussi que les strcpy() de la fonction main() copient nos arguments sans 
 Pour pouvoir afficher notre fichier il faudrait réussire à call m() après fopen(), ce qui nous laisse l'appel à puts() avant de return.
 Il va falloir trouver un moyen de remplacer l'adresse de puts() dans la GOT (cf. level5) par celle de m() pour imprimer le contenu de .pass.
 
-Pour cela, nous allons exploiter le fait que les strcpy() ne soient pas protégés: en cas de buffer overflow du premier, on peut venir écrire sur le premier argument du second strcpy(): l'adresse ou il va écrire la valeur qu'on lui donne en argv[2].
+Pour cela, nous allons exploiter le fait que les strcpy() ne soient pas protégés: en cas de buffer overflow du premier, on peut venir écrire sur la heap dans b[1], qui est le premier argument du second strcpy() (b[1] contient son adresse de destination).
 
 ### Explications
 
