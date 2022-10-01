@@ -134,10 +134,10 @@
       - Stocke esp + 16 (b_ptr) dans eax
       - Stocke eax (&b) sur la stack (à esp)
       - Call edx avec les arguments placés sur la stack
-        - (operator+(&b, &a)) = b->operator(&a) = b + a
+        - (operator+(&b, &a)) = b->operator+(&a) = b + a
       - Stocke a (ebp - 4 = esp + 32 - 4 = esp + 28)dans ebx<br/><br/>
     - <+161> ... <+165>
-      - return eax (a + b)
+      - return eax (b + a)
       - réinitialisation de la mémoire, fin d'exécution<br/><br/>
    
   - `disas 'N::N(int)`
@@ -154,6 +154,7 @@
        0x0804870c <+22>:	ret
     End of assembler dump.
     ```
+    - 
   - `disas 'N::setAnnotation(char*)'`
     ```asm
     Dump of assembler code for function _ZN1N13setAnnotationEPc:
