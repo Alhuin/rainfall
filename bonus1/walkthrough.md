@@ -119,7 +119,7 @@
 
 Après analyse, nous comprenons que pour obtenir notre flag il faut donner en input un nombre dont la valeur doit être inférieure ou égale à 9. Plus loin, cette valeur doit être égale a 0x574f4c46 (1464814662).
 
-Nous voyons aussi que le memcpy() n'est pas protegé en effet notre string b fait 40, et si notre argv[2] fait plus de 40 nous avons un SegFault. 
+Nous voyons aussi que le memcpy() n'est pas protegé. En effet notre string b fait 40, et si notre argv[2] fait plus de 40 nous avons un SegFault. 
 
 - `gdb bonus1`
   - `set disassembly-flavor intel`
@@ -149,8 +149,8 @@ Nous voyons aussi que le memcpy() n'est pas protegé en effet notre string b fai
     gs             0x33     51
     ```
 
-b fait une taille de 40 et en reecrivant jusqu'a 44 nous réécrivons a.
-Pour avoir notre shell notre a doit valoir 0x574f4c46 (1464814662), ca sera donc notre second argument:
+b fait une taille de 40 et en écrivant 4 octets de plus, nous réécrivons a.
+Pour avoir notre shell, notre a doit valoir 0x574f4c46 (1464814662), ca sera donc notre second argument:
 ```c
 $(python -c 'print "A" * 40 + "\x46\x4c\x4f\x57"')
 ```
@@ -162,7 +162,7 @@ Un nombre negatif multiplié par 4 donne toujours un nombre negatif, cependant n
 **INT_MIN**  = -2147483647 - 1<br/>
 **INT_MAX** = 2147483647
 
-La raison de cette difference est la présence d'un bit de signe et nous pouvons abuser de cette particularité pour avoir une valeur supérieure à int min ce qui va passer tous les bit a 1 dont le bit de signe: c'est un [integer overflow](https://fr.wikipedia.org/wiki/D%C3%A9passement_d%27entier). 
+La raison de cette difference est la présence d'un bit de signe et nous pouvons abuser de cette particularité pour effectuer un [integer overflow](https://fr.wikipedia.org/wiki/D%C3%A9passement_d%27entier) afin avoir une valeur supérieure à 9.
 
 Nous utilisons donc [le code python suivant](https://stackoverflow.com/questions/47100105/forcing-integer-overflow-in-python) pour forcer le cast en int et trouver la valeur avec laquelle nous obtenons un integer overflow pour avoir la valeur 44.
 ```python
