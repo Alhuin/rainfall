@@ -217,3 +217,19 @@
     - Return eax (0)
     - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
 ## Exploit
+
+On a vu grâce à l'analyse que le programme attend une string argument, puis ouvre et écrit le contenu du fichier .pass dans un buffer, y fait des modifications en fonction de l'argument fourni (buffer[atoi(argv[1])] = 0) et enfin nous ouvre un shell si l'argument fourni est égal au buffer (strcmp(buffer, argv[1])).
+
+La faille ici est dans le comportement du strcmp: il va effectuer une comparaison jusqu'à la fin de argv[1], ou de buffer en fonction de la string la moins longue. On peut donc lui donner une string vide en paramètre, et celui-ci va comparer ... 0 caractères et nous ouvrir notre shell.
+
+- `./bonus3 ""`
+  ```
+  ```
+  - `whoami`
+  ```
+  end
+  ```
+  - `cat /home/user/end/.pass`
+    ```
+    3321b6f81659f9a71c76616f606e4b50189cecfea611393d5d649f75e157353c
+    ```
