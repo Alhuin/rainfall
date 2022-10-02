@@ -29,13 +29,13 @@
         ```
         - Affiche les inputs
 
-- Avec des inputs de 20, le programme SegFault et semble de pas avoir posé de '\0' au premier argument:
+- Avec des inputs trop longs, le programme SegFault:
   ```
    -
-  AAAAAAAAAAAAAAAAAAAA
+  AAAAAAAAAAAAAAAAAAAAAAAAA
    -
   BBBBBBBBBBBBBBBBBBBB
-  AAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBB�� BBBBBBBBBBBBBBBBBBBB��
+  AAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBB�� BBBBBBBBBBBBBBBBBBBB��
   Segmentation fault (core dumped)
   ```
 
