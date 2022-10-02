@@ -1,30 +1,27 @@
-char *p(char *a, char *dash){
-    char b[4108]; //4120- 12 (pour les 3 arguments)
+char *p(char *buffer, char *dash){
+    char read_buffer[4108]; //4120- 12 (pour les 3 arguments)
     
     puts(dash);
-    read(0, b, 4096);
-    strchr(b , '\n') = '\0';
-    return(strncpy(a, b, 20));
+    read(0, read_buffer, 4096);
+    strchr(read_buffer , '\n') = '\0';
+    return(strncpy(buffer, read_buffer, 20));
 }
 
-void pp(char *a) {
-    char b[20]; 
-    char c[20];
+void pp(char *main_buffer) {
+    char a_buffer[20]; 
+    char b_buffer[20];
 
-    p(b," - ");
-    p(c," - ");
-    strcpy(a, b);
-    len = strlen(a)
-    a[len] = ' ';
-    a[len + 1] = 0;
-    return(strcat(a, c));
+    p(a_buffer," - ");
+    p(b_buffer," - ");
+    strcpy(main_buffer, a_buffer);
+    len = strlen(main_buffer)
+    main_buffer[len] = ' ';
+    return(strcat(main_buffer, b_buffer));
 }
-
-
 
 int    main(int argc, char** argv){
-    char a[42];
-    pp(a);
-    puts(a);
+    char main_buffer[42];
+    pp(main_buffer);
+    puts(main_buffer);
     return(0);
 }
