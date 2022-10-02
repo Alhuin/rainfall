@@ -5,7 +5,7 @@
 
 int main(int argc, char **argv) {
   int ret;
-  char buffer;
+  char buffer[132];
   int fd = fopen("home/user/end/.pass", "r");
   
   memset(buffer, 0, 132);
