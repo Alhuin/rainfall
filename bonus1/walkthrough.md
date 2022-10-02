@@ -29,7 +29,7 @@
     - On ne trouve rien d'autre que la fonction main
 
   - `disas main`
-    ```
+    ```asm
     Dump of assembler code for function main:
        0x08048424 <+0>:     push   ebp
        0x08048425 <+1>:     mov    ebp,esp
