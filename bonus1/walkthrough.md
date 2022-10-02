@@ -159,7 +159,7 @@ Maintenant le souci que nous avons est que la taille copiée par notre memcpy es
 
 Un nombre negatif multiplié par 4 donne toujours un nombre negatif, cependant nous sommes en presence d'integer et nous avons :
 
-**INT_MIN**  = -2147483647 - 1
+**INT_MIN**  = -2147483647 - 1<br/>
 **INT_MAX** = 2147483647
 
 La raison de cette difference est la présence d'un bit de signe et nous pouvons abuser de cette particularité pour avoir une valeur supérieure à int min ce qui va passer tous les bit a 1 dont le bit de signe: c'est un [integer overflow](https://fr.wikipedia.org/wiki/D%C3%A9passement_d%27entier). 
