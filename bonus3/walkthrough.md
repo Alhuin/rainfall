@@ -170,14 +170,15 @@
       - Stocke 0x0 (0) à esp (ebp - 160) + eax (le retour du atoi) * 1 + 0x18 (24) 
         - ebp - 136 + argv[1] = 0
         - esp + 24 + argv[1] = 0
+        - buffer[argv[1]] = 0
       - Fait pointer eax sur esp + 24 (buffer)
-      - Fait pointer edx sur eax + 66 (esp + 90)
+      - Fait pointer edx sur eax + 66 (buffer + 66)
       - Stocke esp + 156 (fd) dans eax
       - Place eax sur la stack (à esp + 12)
       - Place 0x41 (65) sur la stack (à esp + 8)
       - Place 0x1 (1) sur la stack (à esp + 4)
-      - Place edx (second_buffer à esp +90)
-      - Call fread() avec les arguments placés sur la stack (eax = fread(second_buffer, 1, 65, fd))<br/><br/>
+      - Place edx (buffer + 66)
+      - Call fread() avec les arguments placés sur la stack (eax = fread(buffer + 66, 1, 65, fd))<br/><br/>
     - <+196> ... <+206>
       - Stocke esp + 156 (fd) dans eax
       - Place eax (fd) sur la stack (à esp)
