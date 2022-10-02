@@ -21,9 +21,9 @@ int main(int argc, char **argv) {
     fclose(fd);
   
     if (strcmp(buffer, argv[1])
-      execl("/bin/sh", "sh", null)
+      execl("/bin/sh", "sh", 0);
     else
-      puts(buffer[66])
+      puts(buffer[66]);
   }
   
   return (0);  
